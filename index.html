@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>UNIVERSITY WAR: BINGO PRO v26.0</title>
+    <title>UNIVERSITY WAR: BINGO PRO v27.0</title>
     <style>
         :root { --bg: #0a0c14; --panel: #161b2a; --red: #ff4d4d; --yellow: #ffd700; --blue: #4d79ff; --hl: #ffffff; }
         body { background: var(--bg); color: #fff; font-family: 'Pretendard', sans-serif; margin: 0; display: flex; flex-direction: column; align-items: center; min-height: 100vh; overflow: hidden; }
@@ -11,34 +11,34 @@
         .active { display: block; }
 
         /* 상태바 및 스코어 */
-        .scoreboard { display: flex; justify-content: space-around; align-items: center; background: #1a1c2c; padding: 12px; border-radius: 10px; margin-bottom: 10px; border: 1px solid #333; }
-        .score-dot { width: 14px; height: 14px; border-radius: 50%; background: #333; margin: 0 4px; display: inline-block; }
+        .scoreboard { display: flex; justify-content: space-around; align-items: center; background: #1a1c2c; padding: 10px; border-radius: 10px; margin-bottom: 8px; border: 1px solid #333; }
+        .score-dot { width: 12px; height: 12px; border-radius: 50%; background: #333; margin: 0 4px; display: inline-block; }
         .score-dot.win { background: #00c853; box-shadow: 0 0 10px #00c853; }
-        #status-bar { background: var(--panel); padding: 10px; border-radius: 10px; margin-top: 10px; text-align: left; border-left: 5px solid var(--blue); }
+        #status-bar { background: var(--panel); padding: 8px; border-radius: 10px; margin-bottom: 8px; border-left: 5px solid var(--blue); text-align: left; }
 
         /* 보드 디자인 */
-        .board { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; background: #222639; padding: 15px; border-radius: 15px; margin: 10px 0; }
+        .board { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; background: #222639; padding: 12px; border-radius: 15px; margin-bottom: 10px; }
         .cell { aspect-ratio: 1/1; background: #1a1c2c; border: 1px solid #3f445e; border-radius: 10px; cursor: pointer; display: flex; align-items: center; justify-content: center; position: relative; }
         .cell.last-act { outline: 3px solid var(--hl); outline-offset: 3px; z-index: 5; }
-        .cell.selected-piece { background: rgba(255, 255, 255, 0.2); box-shadow: inset 0 0 15px var(--hl); }
+        .cell.selected-piece { background: rgba(255, 215, 0, 0.3); box-shadow: inset 0 0 15px var(--yellow); }
         .cell.win-line { background: rgba(0, 200, 83, 0.4) !important; border-color: #00c853 !important; }
         
-        .piece { width: 85%; height: 85%; border-radius: 8px; box-sizing: border-box; border-width: 6px; border-style: solid; transition: transform 0.3s; }
+        .piece { width: 85%; height: 85%; border-radius: 8px; box-sizing: border-box; border-width: 6px; border-style: solid; transition: transform 0.2s; }
         .bg-red { background-color: var(--red); } .bd-red { border-color: var(--red); }
         .bg-yellow { background-color: var(--yellow); } .bd-yellow { border-color: var(--yellow); }
         .bg-blue { background-color: var(--blue); } .bd-blue { border-color: var(--blue); }
 
         /* 인벤토리 UI */
-        .inventory-label { font-size: 0.75rem; color: #888; text-align: left; padding-left: 5px; margin-top: 10px; }
-        .inventory { display: flex; justify-content: space-around; background: var(--panel); padding: 10px; border-radius: 12px; border: 1px solid #333; margin-bottom: 5px; }
-        .inv-item { padding: 5px; border-radius: 8px; opacity: 0.4; transition: 0.3s; text-align: center; }
-        .inv-item.selected { opacity: 1; background: rgba(255,255,255,0.1); box-shadow: 0 0 15px rgba(255,255,255,0.2); }
-        .inv-preview { width: 35px; height: 35px; border-radius: 6px; border-width: 4px; border-style: solid; margin: 0 auto 3px; }
+        .inventory-label { font-size: 0.7rem; color: #888; text-align: left; padding-left: 5px; margin-top: 5px; }
+        .inventory { display: flex; justify-content: space-around; background: var(--panel); padding: 8px; border-radius: 12px; border: 1px solid #333; margin-bottom: 5px; }
+        .inv-item { padding: 4px; border-radius: 8px; opacity: 0.4; transition: 0.3s; text-align: center; }
+        .inv-item.selected { opacity: 1; background: rgba(255,255,255,0.1); border: 1px solid #555; }
+        .inv-preview { width: 32px; height: 32px; border-radius: 6px; border-width: 4px; border-style: solid; margin: 0 auto 3px; }
 
-        button { background: #2d334d; color: white; border: 1px solid #444; padding: 14px; border-radius: 8px; cursor: pointer; width: 100%; margin: 6px 0; font-weight: bold; }
+        button { background: #2d334d; color: white; border: 1px solid #444; padding: 12px; border-radius: 8px; cursor: pointer; width: 100%; margin: 4px 0; font-weight: bold; }
         .primary { background: var(--blue); border: none; }
         .btn-act { background: #00c853 !important; border-color: #fff !important; }
-        .overlay-box { background: var(--panel); padding: 35px 20px; border-radius: 20px; border: 1px solid #333; margin-top: 50px; box-shadow: 0 10px 40px rgba(0,0,0,0.6); }
+        .overlay-box { background: var(--panel); padding: 30px 20px; border-radius: 20px; border: 1px solid #333; margin-top: 40px; box-shadow: 0 10px 40px rgba(0,0,0,0.6); }
         .pulse { animation: pulse 1.5s infinite; color: var(--blue); }
         @keyframes pulse { 0% { opacity: 0.5; } 50% { opacity: 1; } 100% { opacity: 0.5; } }
     </style>
@@ -48,53 +48,54 @@
     <div id="screen-lobby" class="screen active">
         <h1>UNIVERSITY WAR</h1>
         <input type="text" id="nick-in" placeholder="닉네임" style="width:100%; padding:14px; margin-bottom:12px; background:#111; border:1px solid #444; color:#fff; border-radius:8px;">
-        <button onclick="window.initGame('ai')" class="primary">AI 대결 (연습)</button>
+        <button onclick="window.initGame('ai')" class="primary">AI 대결 시작</button>
         <hr style="border: 0.5px solid #333; margin: 20px 0;">
         <input type="text" id="room-in" placeholder="방 코드" style="width:100%; padding:14px; margin-bottom:12px; background:#111; border:1px solid #444; color:#fff; border-radius:8px;">
-        <button onclick="window.initGame('online')">멀티플레이 매칭</button>
+        <button onclick="window.initGame('online')">온라인 매칭 입장</button>
     </div>
 
     <div id="screen-matching" class="screen">
         <div class="overlay-box">
             <h2 class="pulse">매칭 중...</h2>
-            <p id="room-id-display" style="font-weight:bold; letter-spacing:2px;"></p>
-            <button onclick="location.reload()">취소</button>
+            <p id="room-id-display" style="font-weight:bold; letter-spacing:2px; font-size:1.2rem; background:#111; padding:10px; border-radius:10px;"></p>
+            <button onclick="location.reload()" style="background:#444;">매칭 취소</button>
         </div>
     </div>
 
     <div id="screen-rps" class="screen">
         <div class="overlay-box">
             <h2>가위바위보</h2>
-            <p id="rps-status">상대방 선택 대기 중...</p>
+            <p id="rps-status">상대방의 선택을 기다립니다...</p>
             <div style="display:flex; justify-content:space-around; margin:25px 0;">
-                <button onclick="window.submitRPS('✌️')" style="font-size:2rem; width:80px;">✌️</button>
-                <button onclick="window.submitRPS('✊')" style="font-size:2rem; width:80px;">✊</button>
-                <button onclick="window.submitRPS('🖐️')" style="font-size:2rem; width:80px;">🖐️</button>
+                <button onclick="window.submitRPS('✌️')" style="font-size:2.5rem; width:85px; height:85px;">✌️</button>
+                <button onclick="window.submitRPS('✊')" style="font-size:2.5rem; width:85px; height:85px;">✊</button>
+                <button onclick="window.submitRPS('🖐️')" style="font-size:2.5rem; width:85px; height:85px;">🖐️</button>
             </div>
         </div>
     </div>
 
     <div id="screen-choice" class="screen">
         <div class="overlay-box">
-            <h2 style="color:#00c853;">승리!</h2>
-            <button class="primary" onclick="window.confirmRole('host')">선공 (RED)</button>
-            <button style="background:var(--blue);" onclick="window.confirmRole('guest')">후공 (BLUE)</button>
+            <h2 style="color:#00c853;">가위바위보 승리!</h2>
+            <p>원하는 진영을 선택하세요.</p>
+            <button class="primary" onclick="window.confirmRole('host')">선공 (RED) 선택</button>
+            <button style="background:var(--blue);" onclick="window.confirmRole('guest')">후공 (BLUE) 선택</button>
         </div>
     </div>
 
     <div id="screen-game" class="screen">
         <div class="scoreboard">
-            <div><span id="p1-name">P1</span><br><div id="p1-dots"></div></div>
-            <div>VS</div>
-            <div><span id="p2-name">P2</span><br><div id="p2-dots"></div></div>
+            <div><span id="p1-name" style="font-size:0.8rem; color:#888;">P1</span><br><div id="p1-dots"></div></div>
+            <div style="font-weight:bold; color:#444;">VS</div>
+            <div><span id="p2-name" style="font-size:0.8rem; color:#888;">P2</span><br><div id="p2-dots"></div></div>
         </div>
 
-        <div class="inventory-label">상대방 자원 (AI)</div>
+        <div class="inventory-label">상대방 자원 (AI/OPP)</div>
         <div id="opp-inv-ui" class="inventory"></div>
 
         <div class="board" id="board"></div>
 
-        <div id="phase2-ui" style="display:none; gap:5px;">
+        <div id="phase2-ui" style="display:none; gap:5px; margin-bottom:5px;">
             <button id="act-p" class="btn-act" onclick="window.setAct('place')">착수</button>
             <button id="act-m" onclick="window.setAct('move')">이동</button>
             <button id="act-f" onclick="window.setAct('flip')">뒤집기</button>
@@ -102,18 +103,18 @@
 
         <div class="inventory-label">내 자원 (목표: <span id="my-target-color">-</span>)</div>
         <div id="my-inv-ui" class="inventory"></div>
-        <button class="primary" style="font-size:0.9rem;" onclick="window.flipSelected()">내 말 뒤집기 (앞면 선택)</button>
+        <button class="primary" style="padding:10px; font-size:0.85rem;" onclick="window.flipSelected()">인벤토리 말 뒤집기</button>
 
         <div id="status-bar">
-            <div id="turn-txt" style="font-weight:bold; color:var(--blue);">제 1턴</div>
+            <div id="turn-txt" style="font-weight:bold; color:var(--blue); font-size:0.9rem;">제 1턴</div>
         </div>
     </div>
 
     <div id="screen-result" class="screen">
         <div class="overlay-box">
             <h1 id="res-win-title">RESULT</h1>
-            <h2 id="res-score-board">0 : 0</h2>
-            <button class="primary" onclick="window.nextRoundAction()">다음 라운드</button>
+            <h2 id="res-score-board" style="background:#111; padding:15px; border-radius:10px; letter-spacing:5px;">0 : 0</h2>
+            <button class="primary" onclick="window.nextRoundAction()">다음 라운드 시작</button>
         </div>
     </div>
 
@@ -138,8 +139,8 @@
                 g.room = document.getElementById('room-in').value.toUpperCase();
                 if(!g.room) return alert("방 코드를 입력하세요.");
                 switchScreen('screen-matching');
-                document.getElementById('room-id-display').innerText = `ROOM: ${g.room}`;
-                const ref = doc(db, "unwar_v26", g.room);
+                document.getElementById('room-id-display').innerText = g.room;
+                const ref = doc(db, "unwar_v27", g.room);
                 const snap = await getDoc(ref);
                 if(!snap.exists()) {
                     g.role = 'host';
@@ -147,7 +148,7 @@
                 } else {
                     const data = snap.data();
                     if(!data.guest) { g.role = 'guest'; await updateDoc(ref, { status:'rps', guest:{nick, score:0} }); }
-                    else { g.role = 'spectator'; alert("방이 가득 차 관전 모드로 입장합니다."); }
+                    else { g.role = 'spectator'; alert("관전 모드로 입장합니다."); }
                 }
                 onSnapshot(ref, (s) => {
                     const d = s.data(); if(!d) return;
@@ -163,18 +164,18 @@
             if(g.isAI) {
                 const ai = ['✌️','✊','🖐️'][Math.floor(Math.random()*3)];
                 if(choice === ai) return alert(`무승부! (AI: ${ai})`);
-                (choice==='✊'&&ai==='✌️' || choice==='✌️'&&ai==='🖐️' || choice==='🖐️'&&ai==='✊') ? switchScreen('screen-choice') : (g.role = 'guest', startAIGame());
+                const win = (choice==='✊'&&ai==='✌️' || choice==='✌️'&&ai==='🖐️' || choice==='🖐️'&&ai==='✊');
+                win ? switchScreen('screen-choice') : (g.role = 'guest', startAIGame());
             } else {
-                const p = g.role === 'host' ? 'host.rps' : 'guest.rps';
-                updateDoc(doc(db, "unwar_v26", g.room), { [p]: choice });
+                updateDoc(doc(db, "unwar_v27", g.room), { [`${g.role}.rps`]: choice });
             }
         }
 
         async function checkRPS(d) {
             if(d.host?.rps && d.guest?.rps) {
-                if(d.host.rps === d.guest.rps) { await updateDoc(doc(db, "unwar_v26", g.room), { "host.rps":null, "guest.rps":null }); return; }
+                if(d.host.rps === d.guest.rps) { await updateDoc(doc(db, "unwar_v27", g.room), { "host.rps":null, "guest.rps":null }); return; }
                 const win = (d.host.rps==='✊'&&d.guest.rps==='✌️' || d.host.rps==='✌️'&&d.guest.rps==='🖐️' || d.host.rps==='🖐️'&&d.guest.rps==='✊');
-                await updateDoc(doc(db, "unwar_v26", g.room), { status:'choice', winner: win ? 'host' : 'guest' });
+                await updateDoc(doc(db, "unwar_v27", g.room), { status:'choice', winner: win ? 'host' : 'guest' });
             }
         }
 
@@ -183,7 +184,7 @@
             else {
                 const colors = ['red', 'yellow', 'blue'].sort(() => Math.random() - 0.5);
                 const f = r === 'host' ? 'host' : 'guest', s = f === 'host' ? 'guest' : 'host';
-                await updateDoc(doc(db, "unwar_v26", g.room), { status:'playing', turn:1, board:Array(16).fill(null), lastIdx:-1, [`${f}.target`]:colors[0], [`${s}.target`]:colors[1], [`${f}.inv`]:getNewInv(), [`${s}.inv`]:getNewInv() });
+                await updateDoc(doc(db, "unwar_v27", g.room), { status:'playing', turn:1, board:Array(16).fill(null), lastIdx:-1, [`${f}.target`]:colors[0], [`${s}.target`]:colors[1], [`${f}.inv`]:getNewInv(), [`${s}.inv`]:getNewInv() });
             }
         }
 
@@ -193,40 +194,43 @@
             switchScreen('screen-game'); renderAll();
         }
 
-        // --- 핵심 조작 및 AI (인벤토리 뒤집기 반영) ---
+        // --- [v27.0 핵심] 뒤집기 및 이동 로직 수정 ---
         window.handleMove = async (idx) => {
             if(g.role === 'spectator') return;
             const myTurn = (g.turn % 2 === 1 && g.role === 'host') || (g.turn % 2 === 0 && g.role === 'guest') || (g.isAI && g.turn % 2 === 1);
             if(!myTurn) return;
-            if(idx === g.lastIdx && g.act !== 'place') return alert("상대가 조작한 말은 보호됩니다.");
+
+            // 방어 규칙
+            if(idx === g.lastIdx && g.act !== 'place') return alert("방어 규칙: 상대가 방금 조작한 칸입니다.");
 
             let ok = false;
             if(g.act === 'place' && !g.board[idx]) {
                 const it = g.inv[g.selIdx]; if(it.count <= 0) return alert("자원 부족!");
-                // 인벤토리에서 선택되고 뒤집힌(it.top) 정보를 그대로 적용
                 g.board[idx] = { top: it.sides[it.top], bottom: it.sides[1-it.top] }; it.count--; ok = true;
-            } else if(g.act === 'flip' && g.turn >= 15) {
-                if(g.mFrom === null) { if(g.board[idx]) g.mFrom = idx; }
-                else if(g.mFrom === idx) { const p = g.board[idx]; g.board[idx] = { top: p.bottom, bottom: p.top }; ok = true; g.mFrom = null; }
-                else g.mFrom = idx;
-                renderAll();
-            } else if(g.act === 'move' && g.turn >= 15) {
-                if(g.mFrom === null) { if(g.board[idx]) g.mFrom = idx; }
+            } 
+            else if(g.act === 'flip' && g.turn >= 15) {
+                if(g.mFrom === null) { if(g.board[idx]) { g.mFrom = idx; renderAll(); } }
+                else if(g.mFrom === idx) { // 동일 칸 재클릭 시 뒤집기 실행
+                    const p = g.board[idx]; g.board[idx] = { top: p.bottom, bottom: p.top }; ok = true; g.mFrom = null;
+                } else { g.mFrom = idx; renderAll(); } // 다른 칸 선택
+            } 
+            else if(g.act === 'move' && g.turn >= 15) {
+                if(g.mFrom === null) { if(g.board[idx]) { g.mFrom = idx; renderAll(); } }
                 else {
-                    if(g.board[idx]) g.mFrom = idx;
+                    if(g.board[idx]) { g.mFrom = idx; renderAll(); } // 이동 대상 변경
                     else {
                         const dist = Math.abs(Math.floor(g.mFrom/4)-Math.floor(idx/4)) + Math.abs((g.mFrom%4)-(idx%4));
                         if(dist === 1) { g.board[idx] = g.board[g.mFrom]; g.board[g.mFrom] = null; ok = true; g.mFrom = null; }
+                        else { alert("상하좌우 1칸만 이동 가능합니다."); g.mFrom = null; renderAll(); }
                     }
                 }
-                renderAll();
-            }
+            } else if(g.turn < 15 && g.act !== 'place') return alert("15턴부터 가능한 액션입니다.");
 
             if(ok) {
                 const win = checkBingo(g.board);
                 if(g.isAI) { if(win) showResult(win); else { g.turn++; g.lastIdx = idx; renderAll(); setTimeout(aiThink, 800); } }
                 else {
-                    const ref = doc(db, "unwar_v26", g.room);
+                    const ref = doc(db, "unwar_v27", g.room);
                     if(win) {
                         const winRole = (win === g.target) ? g.role : (g.role==='host'?'guest':'host');
                         await updateDoc(ref, { status:'result', winColor: win, [`${winRole}.score`]: g.scores[winRole]+1, board:g.board, lastIdx:idx });
@@ -238,6 +242,7 @@
             }
         };
 
+        // --- AI 로직 ---
         function aiThink() {
             let m = findWin(g.aiTarget, g.aiInv) || findWin(g.target, g.aiInv) || getBestMove(g.aiInv);
             if(m.type === 'place') {
@@ -249,9 +254,11 @@
         }
 
         function findWin(c, inv) {
+            if(g.turn >= 15) { for(let i=0; i<16; i++) { if(g.board[i] && i!==g.lastIdx) { let tb=JSON.parse(JSON.stringify(g.board)); tb[i].top=g.board[i].bottom; if(checkBingo(tb)===c) return {idx:i, type:'flip'}; } } }
             for(let i=0; i<16; i++) { if(!g.board[i]) { let tb=[...g.board]; tb[i]={top:c}; if(checkBingo(tb)===c && inv.find(it=>it.sides.includes(c)&&it.count>0)) return {idx:i, type:'place'}; } }
             return null;
         }
+
         function getBestMove(inv) {
             const emps = g.board.map((v,i)=>v===null?i:null).filter(v=>v!==null);
             const targetIdx = emps.find(i => [5,6,9,10].includes(i)) || emps[0];
@@ -259,6 +266,7 @@
             return invIdx !== -1 ? { type:'place', idx:targetIdx, invIdx } : null;
         }
 
+        // --- 동기화 및 렌더링 ---
         function sync(d) {
             g.board = d.board; g.turn = d.turn; g.lastIdx = d.lastIdx;
             g.scores = { host: d.host.score, guest: d.guest.score };
@@ -267,7 +275,7 @@
             renderAll(d.host.nick, d.guest?.nick || 'OPP');
         }
 
-        function renderAll(n1='YOU', n2='OPP') {
+        function renderAll(n1='P1', n2='P2') {
             const b = document.getElementById('board'); b.innerHTML = '';
             g.board.forEach((c, i) => {
                 const d = document.createElement('div');
@@ -278,18 +286,18 @@
             const myUI = document.getElementById('my-inv-ui'); myUI.innerHTML = '';
             g.inv.forEach((it, i) => {
                 const d = document.createElement('div'); d.className = `inv-item ${g.selIdx === i ? 'selected' : ''}`;
-                d.innerHTML = `<div class="inv-preview bg-${it.sides[it.top]} bd-${it.sides[1-it.top]}"></div><div>${it.count}</div>`;
+                d.innerHTML = `<div class="inv-preview bg-${it.sides[it.top]} bd-${it.sides[1-it.top]}"></div><div style="font-size:10px;">${it.count}</div>`;
                 d.onclick = () => { g.selIdx = i; renderAll(n1, n2); }; myUI.appendChild(d);
             });
             const oppUI = document.getElementById('opp-inv-ui'); oppUI.innerHTML = '';
             g.aiInv.forEach(it => {
                 const d = document.createElement('div'); d.className = 'inv-item';
-                d.innerHTML = `<div class="inv-preview bg-${it.sides[it.top]} bd-${it.sides[1-it.top]}"></div><div>${it.count}</div>`;
+                d.innerHTML = `<div class="inv-preview bg-${it.sides[it.top]} bd-${it.sides[1-it.top]}"></div><div style="font-size:10px;">${it.count}</div>`;
                 oppUI.appendChild(d);
             });
             const tEl = document.getElementById('my-target-color');
             tEl.innerText = g.target.toUpperCase(); tEl.style.color = `var(--${g.target})`;
-            document.getElementById('turn-txt').innerText = `제 ${g.turn}턴`;
+            document.getElementById('turn-txt').innerText = `제 ${g.turn}턴 (${Math.ceil(g.turn/2)}회차)`;
             document.getElementById('phase2-ui').style.display = (g.turn >= 15 && g.role !== 'spectator') ? 'flex' : 'none';
             document.getElementById('p1-name').innerText = n1; document.getElementById('p2-name').innerText = n2;
             renderDots('p1-dots', g.scores.host); renderDots('p2-dots', g.scores.guest);
@@ -306,6 +314,7 @@
             switchScreen('screen-result');
             document.getElementById('res-win-title').innerText = (winColor === g.target) ? "승리!" : "패배..";
             document.getElementById('res-score-board').innerText = `${g.scores.host} : ${g.scores.guest}`;
+            renderAll();
         }
 
         function renderDots(id, s) { const el=document.getElementById(id); el.innerHTML=''; for(let i=0; i<2; i++){ const d=document.createElement('div'); d.className='score-dot'+(i<s?' win':''); el.appendChild(d); }}
@@ -313,16 +322,8 @@
         
         window.initGame = initGame; window.submitRPS = submitRPS; window.confirmRole = confirmRole;
         window.setAct = (a) => { g.act = a; g.mFrom = null; document.querySelectorAll('#phase2-ui button').forEach(b => b.classList.remove('btn-act')); document.getElementById(`act-${a[0]}`).classList.add('btn-act'); renderAll(); };
-        
-        // [수정된 기능] 인벤토리 말 뒤집기
-        window.flipSelected = () => { 
-            g.inv[g.selIdx].top = 1 - g.inv[g.selIdx].top; 
-            renderAll(); 
-        };
-
-        window.nextRoundAction = () => {
-            g.board=Array(16).fill(null); g.turn=1; g.lastIdx=-1; g.winLine=[]; g.inv=getNewInv(); g.aiInv=getNewInv(); switchScreen('screen-game'); renderAll();
-        };
+        window.flipSelected = () => { g.inv[g.selIdx].top = 1 - g.inv[g.selIdx].top; renderAll(); };
+        window.nextRoundAction = () => { g.board=Array(16).fill(null); g.turn=1; g.lastIdx=-1; g.winLine=[]; g.inv=getNewInv(); g.aiInv=getNewInv(); switchScreen('screen-game'); renderAll(); };
     </script>
 </body>
 </html>
