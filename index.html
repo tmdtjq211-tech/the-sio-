@@ -2,81 +2,84 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <title>UNIVERSITY WAR: BINGO PRO (OFFICIAL)</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UNIVERSITY WAR: BINGO PRO (ADVANCED)</title>
     <style>
-        :root { --bg: #0d0f1a; --panel: #1a1c2c; --red: #ff4d4d; --yellow: #ffd700; --blue: #4d79ff; }
+        :root { --bg: #0d0f1a; --panel: #1a1c2c; --red: #ff4d4d; --yellow: #ffd700; --blue: #4d79ff; --white: #ffffff; }
         body { background: var(--bg); color: #fff; font-family: 'Pretendard', sans-serif; margin: 0; display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
         
         .screen { display: none; width: 100%; max-width: 450px; padding: 20px; text-align: center; }
         .active { display: block; }
 
-        /* 보드 및 말 디자인 (테두리에 뒷면 표시) */
-        .board { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; background: #2a2d3e; padding: 10px; border-radius: 12px; margin: 20px 0; }
+        /* 보드판 및 말 디자인 */
+        .board { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; background: #2a2d3e; padding: 10px; border-radius: 12px; margin: 15px 0; }
         .cell { aspect-ratio: 1/1; background: #1a1c2c; border: 1px solid #3f445e; border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; position: relative; }
-        .cell.last-act { outline: 3px solid #fff; outline-offset: -3px; }
+        .cell.last-act { outline: 3px solid var(--white); outline-offset: -3px; }
 
-        /* 말: 내부가 앞면, 테두리가 뒷면 */
+        /* 말: 내부(앞면), 테두리(뒷면) */
         .piece { 
             width: 80%; height: 80%; border-radius: 6px; 
-            box-sizing: border-box; border-width: 6px; border-style: solid;
-            transition: all 0.3s;
+            box-sizing: border-box; border-width: 7px; border-style: solid;
+            transition: transform 0.3s, border-color 0.3s;
         }
         .bg-red { background-color: var(--red); } .bd-red { border-color: var(--red); }
         .bg-yellow { background-color: var(--yellow); } .bd-yellow { border-color: var(--yellow); }
         .bg-blue { background-color: var(--blue); } .bd-blue { border-color: var(--blue); }
 
-        /* 인벤토리 UI */
-        .inventory { display: flex; justify-content: space-around; background: var(--panel); padding: 15px; border-radius: 12px; margin-top: 10px; border: 1px solid #333; }
-        .inv-item { cursor: pointer; padding: 8px; border-radius: 8px; transition: 0.2s; text-align: center; }
-        .inv-item.selected { background: #2d334d; box-shadow: 0 0 10px rgba(255,255,255,0.2); }
-        .inv-preview { width: 40px; height: 40px; border-radius: 4px; border: 4px solid; margin: 0 auto 5px; }
+        /* 인벤토리 */
+        .inventory { display: flex; justify-content: space-around; background: var(--panel); padding: 15px; border-radius: 12px; border: 1px solid #333; }
+        .inv-item { cursor: pointer; padding: 8px; border-radius: 8px; transition: 0.2s; text-align: center; opacity: 0.5; }
+        .inv-item.selected { opacity: 1; background: #2d334d; border: 1px solid #555; }
+        .inv-preview { width: 35px; height: 35px; border-radius: 4px; border: 5px solid; margin: 0 auto 5px; }
 
-        /* 하단 컨트롤 */
-        button { background: #2d334d; color: white; border: 1px solid #444; padding: 12px; border-radius: 8px; cursor: pointer; width: 100%; margin: 5px 0; font-weight: bold; }
-        button.primary { background: #4d79ff; border: none; }
-        .btn-flip { background: #555; font-size: 0.8rem; margin-top: 5px; }
+        /* 버튼 */
+        button { background: #2d334d; color: white; border: 1px solid #444; padding: 12px; border-radius: 8px; cursor: pointer; width: 100%; margin: 5px 0; font-weight: bold; font-size: 1rem; }
+        button.primary { background: var(--blue); border: none; }
+        button.active-act { background: #00c853; border-color: #fff; }
+        .action-btns { display: flex; gap: 5px; margin-bottom: 10px; }
+        
+        #status-bar { background: var(--panel); padding: 15px; border-radius: 12px; margin-bottom: 15px; border-left: 5px solid var(--blue); }
     </style>
 </head>
 <body>
 
     <div id="screen-lobby" class="screen active">
-        <h1>UNIVERSITY WAR</h1>
-        <p style="color: #888;">양면빙고 PRO: 9개 말 공식 룰</p>
-        <input type="text" id="nick-in" placeholder="닉네임" style="width:100%; padding:12px; margin-bottom:10px; background:#111; border:1px solid #444; color:#fff; border-radius:8px;">
-        <button class="primary" onclick="startTutorial()">튜토리얼 시작</button>
-        <button onclick="startAIMode()">AI 연습 모드</button>
+        <h1 style="letter-spacing: 2px;">UNIVERSITY WAR</h1>
+        <p style="color: #888;">양면빙고 Official Rule v2.0</p>
+        <input type="text" id="nick-in" placeholder="닉네임 입력" style="width:100%; padding:12px; margin-bottom:10px; background:#111; border:1px solid #444; color:#fff; border-radius:8px; box-sizing:border-box;">
+        <button class="primary" onclick="startTutorial()">규칙 배우기 (튜토리얼)</button>
+        <button onclick="startAIMode()">AI 연습 모드 (싱글)</button>
         <hr style="border: 0.5px solid #333; margin: 20px 0;">
-        <input type="text" id="room-in" placeholder="방 코드" style="width:100%; padding:12px; margin-bottom:10px; background:#111; border:1px solid #444; color:#fff; border-radius:8px;">
-        <button onclick="joinGame('player')">온라인 대전 입장</button>
+        <input type="text" id="room-in" placeholder="방 코드 (예: BINGO)" style="width:100%; padding:12px; margin-bottom:10px; background:#111; border:1px solid #444; color:#fff; border-radius:8px; box-sizing:border-box;">
+        <button onclick="joinGame('player')">온라인 대전 시작</button>
     </div>
 
     <div id="screen-game" class="screen">
-        <div id="status-bar" style="background:var(--panel); padding:15px; border-radius:12px; margin-bottom:15px;">
-            <div id="turn-info" style="font-size: 1.1rem; color: #4d79ff; font-weight: bold;">당신의 차례 (1/30)</div>
-            <div id="target-info" style="margin-top:5px; font-weight:bold;">목표: <span id="my-target">-</span></div>
+        <div id="status-bar">
+            <div id="turn-txt" style="font-size: 1.1rem; font-weight: bold; color: var(--blue);">플레이어 차례 (1/30)</div>
+            <div id="target-txt" style="margin-top:5px;">목표 색상: <span id="my-target" style="font-weight:bold;">-</span></div>
         </div>
 
         <div class="board" id="board"></div>
 
-        <div id="action-selector" style="display:none; margin-bottom:10px;">
-            <div style="display:flex; gap:5px;">
-                <button onclick="setAct('place')" id="act-p" style="background:#00c853;">착수</button>
-                <button onclick="setAct('move')" id="act-m">이동</button>
-                <button onclick="setAct('flip')" id="act-f">뒤집기</button>
+        <div id="action-ui" style="display:none;">
+            <div class="action-btns">
+                <button id="btn-p" class="active-act" onclick="setAct('place')">착수</button>
+                <button id="btn-m" onclick="setAct('move')">이동</button>
+                <button id="btn-f" onclick="setAct('flip')">뒤집기</button>
             </div>
         </div>
 
-        <div class="inventory" id="inventory"></div>
-        <button class="btn-flip" onclick="flipSelected()">말 뒤집기 (앞면 색상 변경)</button>
+        <div class="inventory" id="inv-ui"></div>
+        <button onclick="flipSelected()" style="background:#444; font-size:0.8rem; margin-top:10px;">말 뒤집기 (앞면 색상 변경)</button>
 
-        <button onclick="location.reload()" style="margin-top:20px; background:#444; font-size:0.8rem;">로비로 나가기</button>
+        <button onclick="location.reload()" style="margin-top:20px; background:#222; font-size:0.8rem; border-color:#333;">방 나가기</button>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { getFirestore, doc, setDoc, getDoc, onSnapshot, updateDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-        // Firebase 설정 (사용자 설정 그대로 적용)
         const firebaseConfig = {
             apiKey: "AIzaSyDcKWKTei9L2Sat-XxinlXknabIcHgmjGs",
             authDomain: "d454545-ac9b1.firebaseapp.com",
@@ -88,11 +91,9 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-        // 게임 상태 관리
         let g = {
             nick: '', room: '', role: 'host', isAI: false,
             target: '', turn: 1, board: Array(16).fill(null), lastIdx: -1,
-            // 3종류의 양면 말 세트 (빨-노, 노-파, 파-빨)
             inv: [
                 { sides: ['red', 'yellow'], count: 3, topIdx: 0 },
                 { sides: ['yellow', 'blue'], count: 3, topIdx: 0 },
@@ -101,35 +102,63 @@
             selIdx: 0, act: 'place', moveFrom: null
         };
 
-        // --- 인벤토리 렌더링 ---
-        function renderInv() {
-            const invEl = document.getElementById('inventory');
-            invEl.innerHTML = '';
-            g.inv.forEach((item, i) => {
-                const div = document.createElement('div');
-                div.className = `inv-item ${g.selIdx === i ? 'selected' : ''}`;
-                const top = item.sides[item.topIdx];
-                const bottom = item.sides[1 - item.topIdx];
-                
-                div.innerHTML = `
-                    <div class="inv-preview bg-${top} bd-${bottom}"></div>
-                    <div style="font-size:10px;">${item.count}개</div>
-                `;
-                div.onclick = () => { g.selIdx = i; renderInv(); };
-                invEl.appendChild(div);
-            });
-        }
-
-        // 선택한 말 뒤집기 (착수 전 선택)
-        window.flipSelected = () => {
-            g.inv[g.selIdx].topIdx = 1 - g.inv[g.selIdx].topIdx;
-            renderInv();
+        // --- 초기 설정 ---
+        window.startAIMode = () => {
+            const colors = ['red', 'yellow', 'blue'].sort(() => Math.random() - 0.5);
+            g.target = colors[0];
+            g.aiTarget = colors[1]; // 중복되지 않는 AI 목표
+            g.isAI = true; g.role = 'host';
+            document.getElementById('screen-lobby').classList.remove('active');
+            document.getElementById('screen-game').classList.add('active');
+            initUI();
         };
 
-        // --- 보드 렌더링 ---
+        window.joinGame = async (role) => {
+            g.nick = document.getElementById('nick-in').value || 'Guest';
+            g.room = document.getElementById('room-in').value.toUpperCase();
+            if(!g.room) return alert("방 코드를 입력하세요.");
+            g.role = role;
+
+            const ref = doc(db, "official_bingo", g.room);
+            const snap = await getDoc(ref);
+            const colors = ['red', 'yellow', 'blue'].sort(() => Math.random() - 0.5);
+
+            if(!snap.exists()) {
+                await setDoc(ref, { 
+                    board: Array(16).fill(null), turn: 1, lastIdx: -1,
+                    host: { nick: g.nick, target: colors[0], inv: g.inv },
+                    guest: null, colorPool: [colors[1], colors[2]]
+                });
+            } else if(role === 'player' && !snap.data().guest) {
+                const data = snap.data();
+                await updateDoc(ref, { 
+                    guest: { nick: g.nick, target: data.colorPool[0], inv: g.inv }
+                });
+            }
+
+            document.getElementById('screen-lobby').classList.remove('active');
+            document.getElementById('screen-game').classList.add('active');
+            onSnapshot(ref, (s) => {
+                const data = s.data();
+                if(!data) return;
+                g.board = data.board; g.turn = data.turn; g.lastIdx = data.lastIdx;
+                const me = role === 'host' ? data.host : data.guest;
+                if(me) { g.target = me.target; g.inv = me.inv; }
+                initUI();
+            });
+        };
+
+        function initUI() {
+            renderBoard();
+            renderInv();
+            const targetEl = document.getElementById('my-target');
+            targetEl.innerText = g.target.toUpperCase();
+            targetEl.style.color = `var(--${g.target})`;
+        }
+
+        // --- 렌더링 ---
         function renderBoard() {
-            const b = document.getElementById('board');
-            b.innerHTML = '';
+            const b = document.getElementById('board'); b.innerHTML = '';
             g.board.forEach((cell, i) => {
                 const div = document.createElement('div');
                 div.className = 'cell' + (g.lastIdx === i ? ' last-act' : '');
@@ -138,113 +167,104 @@
                     p.className = `piece bg-${cell.top} bd-${cell.bottom}`;
                     div.appendChild(p);
                 }
-                div.onclick = () => handleMove(i);
+                div.onclick = () => handleMove(idxToCoord(i));
                 b.appendChild(div);
             });
-            
-            document.getElementById('turn-info').innerText = `제 ${g.turn}턴 (${Math.ceil(g.turn/2)}회차)`;
-            document.getElementById('action-selector').style.display = g.turn >= 15 ? 'block' : 'none';
+            document.getElementById('turn-txt').innerText = `${g.turn % 2 === 1 ? '선공' : '후공'} 차례 (제 ${g.turn}턴)`;
+            document.getElementById('action-ui').style.display = g.turn >= 15 ? 'block' : 'none';
         }
 
-        // --- 착수 및 이동 로직 ---
+        function renderInv() {
+            const invEl = document.getElementById('inv-ui'); invEl.innerHTML = '';
+            g.inv.forEach((item, i) => {
+                const div = document.createElement('div');
+                div.className = `inv-item ${g.selIdx === i ? 'selected' : ''}`;
+                const top = item.sides[item.topIdx];
+                const bottom = item.sides[1 - item.topIdx];
+                div.innerHTML = `<div class="inv-preview bg-${top} bd-${bottom}"></div><span style="font-size:10px;">${item.count}개</span>`;
+                div.onclick = () => { g.selIdx = i; renderInv(); };
+                invEl.appendChild(div);
+            });
+        }
+
+        window.flipSelected = () => { g.inv[g.selIdx].topIdx = 1 - g.inv[g.selIdx].topIdx; renderInv(); };
+
+        // --- 게임 로직 ---
         async function handleMove(idx) {
             const isMyTurn = (g.turn % 2 === 1 && g.role === 'host') || (g.turn % 2 === 0 && g.role === 'guest') || (g.isAI && g.turn % 2 === 1);
             if(!isMyTurn) return;
-            if(idx === g.lastIdx && g.act !== 'place') return alert("상대가 방금 조작한 말은 건드릴 수 없습니다.");
+            if(idx === g.lastIdx && g.act !== 'place') return alert("상대가 방금 조작한 말은 보호됩니다.");
 
             let updated = false;
             if(g.act === 'place' && !g.board[idx]) {
-                const item = g.inv[g.selIdx];
-                if(item.count <= 0) return alert("해당 종류의 말이 없습니다.");
-                
-                g.board[idx] = { top: item.sides[item.topIdx], bottom: item.sides[1 - item.topIdx] };
-                item.count--;
-                updated = true;
+                const it = g.inv[g.selIdx];
+                if(it.count <= 0) return alert("남은 말이 없습니다.");
+                g.board[idx] = { top: it.sides[it.topIdx], bottom: it.sides[1 - it.topIdx] };
+                it.count--; updated = true;
             } else if(g.act === 'flip' && g.board[idx]) {
-                const p = g.board[idx];
-                g.board[idx] = { top: p.bottom, bottom: p.top };
+                const p = g.board[idx]; g.board[idx] = { top: p.bottom, bottom: p.top };
                 updated = true;
             } else if(g.act === 'move') {
-                if(g.moveFrom === null && g.board[idx]) { g.moveFrom = idx; alert("이동할 인접 칸을 선택하세요."); }
+                if(g.moveFrom === null && g.board[idx]) { g.moveFrom = idx; alert("이동할 칸을 선택하세요."); }
                 else if(g.moveFrom !== null && !g.board[idx]) {
                     if([1, 4].includes(Math.abs(g.moveFrom - idx))) {
-                        g.board[idx] = g.board[g.moveFrom];
-                        g.board[g.moveFrom] = null;
+                        g.board[idx] = g.board[g.moveFrom]; g.board[g.moveFrom] = null;
                         updated = true; g.moveFrom = null;
-                    } else { alert("인접한 칸으로만 이동 가능합니다."); g.moveFrom = null; }
+                    } else { g.moveFrom = null; alert("인접 칸으로만 이동 가능합니다."); }
                 }
             }
 
             if(updated) {
                 g.turn++; g.lastIdx = idx;
-                if(g.isAI) { renderBoard(); renderInv(); if(!checkWin()) setTimeout(aiAction, 800); }
+                if(g.isAI) { initUI(); if(!checkWin()) setTimeout(aiTurn, 800); }
                 else {
-                    const ref = doc(db, "war_bingo_v2", g.room);
-                    const invPath = g.role === 'host' ? "hostInv" : "guestInv";
-                    await updateDoc(ref, { board: g.board, turn: g.turn, lastIdx: idx, [invPath]: g.inv });
+                    const ref = doc(db, "official_bingo", g.room);
+                    const path = g.role === 'host' ? "host" : "guest";
+                    await updateDoc(ref, { board: g.board, turn: g.turn, lastIdx: idx, [`${path}.inv`]: g.inv });
                 }
                 checkWin();
             }
         }
 
-        // --- 승리 판정 ---
+        // --- 상향된 AI 로직 ---
+        function aiTurn() {
+            const empties = g.board.map((v, i) => v === null ? i : null).filter(v => v !== null);
+            if(empties.length === 0) return;
+
+            // 1. 승리 가능한 자리 찾기 (생략 - 간단 구현)
+            // 2. 본인 목표 색상이 앞면이 되도록 배치 시도
+            let bestIdx = empties[Math.floor(Math.random() * empties.length)];
+            
+            // AI가 가진 말 중 자신의 목표색(aiTarget)이 포함된 말 찾기
+            const aiPieceIdx = [0,1,2].find(i => PIECE_TYPES[i].includes(g.aiTarget));
+            const topSide = g.aiTarget;
+            const bottomSide = PIECE_TYPES[aiPieceIdx].find(c => c !== g.aiTarget);
+
+            g.board[bestIdx] = { top: topSide, bottom: bottomSide };
+            g.turn++; g.lastIdx = bestIdx;
+            initUI(); checkWin();
+        }
+
         function checkWin() {
             const lines = [[0,1,2,3],[4,5,6,7],[8,9,10,11],[12,13,14,15],[0,4,8,12],[1,5,9,13],[2,6,10,14],[3,7,11,15],[0,5,10,15],[3,6,9,12]];
             for(let l of lines) {
-                const tops = l.map(i => g.board[i]?.top);
-                if(tops.every(t => t && t === tops[0])) {
-                    alert(`게임 종료! 승리 컬러: ${tops[0].toUpperCase()}`);
+                const t = l.map(i => g.board[i]?.top);
+                if(t.every(c => c && c === t[0])) {
+                    alert(`빙고! 승리 컬러: ${t[0].toUpperCase()}`);
                     location.reload(); return true;
                 }
             }
             return false;
         }
 
-        // AI 연습 모드 시작
-        window.startAIMode = () => {
-            g.isAI = true; g.target = 'RED'; g.role = 'host';
-            document.getElementById('screen-lobby').classList.remove('active');
-            document.getElementById('screen-game').classList.add('active');
-            document.getElementById('my-target').innerText = g.target;
-            renderBoard(); renderInv();
+        const PIECE_TYPES = [['red', 'yellow'], ['yellow', 'blue'], ['blue', 'red']];
+        function idxToCoord(i) { return i; }
+        window.setAct = (a) => { 
+            g.act = a;
+            document.querySelectorAll('.action-btns button').forEach(b => b.classList.remove('active-act'));
+            document.getElementById(`btn-${a[0]}`).classList.add('active-act');
         };
-
-        function aiAction() {
-            const empties = g.board.map((v, i) => v === null ? i : null).filter(v => v !== null);
-            if(empties.length > 0) {
-                const idx = empties[Math.floor(Math.random() * empties.length)];
-                g.board[idx] = { top: 'blue', bottom: 'yellow' }; // AI는 블루 고정 전략
-                g.turn++; g.lastIdx = idx;
-                renderBoard(); renderInv(); checkWin();
-            }
-        }
-
-        window.joinGame = async (role) => {
-            g.nick = document.getElementById('nick-in').value || 'Guest';
-            g.room = document.getElementById('room-in').value.toUpperCase();
-            if(!g.room) return alert("방 코드를 입력하세요.");
-            g.role = role;
-            
-            const ref = doc(db, "war_bingo_v2", g.room);
-            const snap = await getDoc(ref);
-            if(!snap.exists()) {
-                await setDoc(ref, { board: Array(16).fill(null), turn: 1, host: g.nick, hostInv: g.inv, lastIdx: -1, guest: null });
-            } else if(role === 'player' && !snap.data().guest) {
-                await updateDoc(ref, { guest: g.nick, guestInv: g.inv });
-            }
-            
-            document.getElementById('screen-lobby').classList.remove('active');
-            document.getElementById('screen-game').classList.add('active');
-            onSnapshot(ref, (s) => {
-                const data = s.data();
-                g.board = data.board; g.turn = data.turn; g.lastIdx = data.lastIdx;
-                const myInv = role === 'host' ? data.hostInv : data.guestInv;
-                if(myInv) g.inv = myInv;
-                renderBoard(); renderInv();
-            });
-        };
-        
-        window.setAct = (a) => { g.act = a; alert(`${a.toUpperCase()} 액션 선택됨`); };
+        window.startTutorial = () => alert("1. 목표색으로 4칸 빙고 만들기\n2. 9개의 양면 말을 앞뒷면 전략적으로 사용\n3. 15턴부터 이동/뒤집기 가능\n4. 상대방이 방금 둔 말은 조작 불가!");
 
     </script>
 </body>
