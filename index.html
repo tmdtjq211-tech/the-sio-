@@ -6,91 +6,76 @@
     <title>UNIVERSITY WAR: DOUBLE-SIDED BINGO</title>
     <style>
         :root { --bg: #0a0a0a; --panel: #1a1a1a; --p1: #ff4d4d; --p2: #4d79ff; --border: #333; }
-        body { background: var(--bg); color: #fff; font-family: 'Pretendard', sans-serif; margin: 0; display: flex; justify-content: center; align-items: center; min-height: 100vh; overflow-x: hidden; }
+        body { background: var(--bg); color: #fff; font-family: 'Pretendard', sans-serif; margin: 0; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
         
-        /* 공통 레이아웃 */
-        .screen { display: none; width: 100%; max-width: 400px; padding: 20px; text-align: center; animation: fadeIn 0.5s; }
+        .screen { display: none; width: 100%; max-width: 400px; padding: 20px; text-align: center; }
         .active { display: block; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-        /* 네모 테두리 디자인 (양면빙고 핵심) */
+        /* 네모 테두리 디자인 */
         .board { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin: 20px 0; }
         .cell { 
             aspect-ratio: 1/1; background: #222; border: 4px solid var(--border); 
-            border-radius: 8px; cursor: pointer; transition: 0.2s; position: relative;
+            border-radius: 8px; cursor: pointer; transition: 0.2s;
         }
-        .cell.top-p1 { border-color: var(--p1); box-shadow: inset 0 0 15px rgba(255, 77, 77, 0.4); }
-        .cell.top-p2 { border-color: var(--p2); box-shadow: inset 0 0 15px rgba(77, 121, 255, 0.4); }
-        .cell:hover { background: #333; }
+        .cell.top-p1 { border-color: var(--p1); box-shadow: inset 0 0 15px rgba(255, 77, 77, 0.5); }
+        .cell.top-p2 { border-color: var(--p2); box-shadow: inset 0 0 15px rgba(77, 121, 255, 0.5); }
 
-        /* 버튼 및 입력창 */
-        button { background: #333; color: white; border: 1px solid #555; padding: 12px 20px; border-radius: 5px; cursor: pointer; width: 100%; margin: 5px 0; font-weight: bold; }
-        button:hover { background: #444; border-color: #777; }
+        button { background: #333; color: white; border: 1px solid #555; padding: 12px; border-radius: 5px; cursor: pointer; width: 100%; margin: 5px 0; font-weight: bold; }
         button.primary { background: var(--p1); border: none; }
-        button.ready { background: #00c853; }
-        input { width: calc(100% - 24px); padding: 12px; margin-bottom: 10px; background: #111; border: 1px solid #444; color: white; border-radius: 5px; }
-
-        /* 게임 상태창 */
-        .status-box { background: var(--panel); padding: 15px; border-radius: 10px; margin-bottom: 20px; border-left: 5px solid var(--p1); }
-        .player-info { display: flex; justify-content: space-between; margin-top: 10px; font-size: 0.9rem; }
-        .spectator-tag { font-size: 0.7rem; color: #888; background: #333; padding: 2px 6px; border-radius: 3px; }
+        button.active-mode { background: #00c853; border-color: #fff; }
+        input { width: calc(100% - 24px); padding: 12px; margin-bottom: 10px; background: #111; border: 1px solid #444; color: white; }
+        
+        .status-box { background: var(--panel); padding: 15px; border-radius: 10px; margin-bottom: 20px; }
     </style>
 </head>
 <body>
 
     <div id="screen-auth" class="screen active">
         <h1>UNIVERSITY WAR</h1>
-        <p>양면빙고 온라인 멀티플레이</p>
         <div id="login-form">
             <button class="primary" onclick="handleGoogleLogin()">Google 로그인</button>
         </div>
         <div id="nick-form" style="display:none;">
-            <input type="text" id="input-nickname" placeholder="사용할 닉네임 입력">
-            <button onclick="handleSaveNickname()">닉네임 설정 완료</button>
+            <input type="text" id="input-nickname" placeholder="사용할 닉네임">
+            <button onclick="handleSaveNickname()">설정 완료</button>
         </div>
     </div>
 
     <div id="screen-lobby" class="screen">
-        <div class="status-box">
-            <h3 id="display-user">사용자님 환영합니다</h3>
-        </div>
+        <div class="status-box"><h3 id="display-user">환영합니다</h3></div>
         <button onclick="startAIMode()">AI 연습 모드 (싱글)</button>
-        <hr style="border: 0.5px solid #333; margin: 20px 0;">
-        <input type="text" id="input-roomid" placeholder="방 코드 입력 (입장 시)">
-        <button onclick="handleCreateRoom()">방 만들기 (HOST)</button>
-        <button onclick="handleJoinRoom('guest')">방 입장하기 (PLAYER)</button>
-        <button onclick="handleJoinRoom('spectator')">관전하기 (SPECTATOR)</button>
-        <button onclick="showTutorial()">튜토리얼 가이드</button>
+        <hr style="border:0.5px solid #333; margin:20px 0;">
+        <input type="text" id="input-roomid" placeholder="방 코드 입력">
+        <button onclick="handleCreateRoom()">방 만들기</button>
+        <button onclick="handleJoinRoom('guest')">방 입장하기</button>
     </div>
 
     <div id="screen-game" class="screen">
-        <div id="game-info" class="status-box">
-            <div id="room-id-display" style="font-size: 0.7rem; color: #aaa;">ROOM: -</div>
-            <h2 id="game-status">대기 중...</h2>
-            <div class="player-info">
-                <span id="p1-nick">P1: 대기 중</span>
-                <span id="p2-nick">P2: 대기 중</span>
+        <div class="status-box">
+            <div id="room-info" style="font-size:0.7rem; color:#888;">AI MODE</div>
+            <h2 id="game-status">준비해주세요</h2>
+            <div style="display:flex; justify-content:space-between; font-size:0.8rem;">
+                <span id="p1-label">P1(RED): -</span>
+                <span id="p2-label">P2(BLUE): -</span>
             </div>
         </div>
 
-        <div class="board" id="board">
-            </div>
+        <div class="board" id="board"></div>
 
-        <div id="game-controls">
-            <div id="mode-selector" style="margin-bottom: 15px;">
-                <button id="btn-front" style="width: 48%;" onclick="setPlaceMode('front')" class="ready">내 색상 위로</button>
-                <button id="btn-back" style="width: 48%;" onclick="setPlaceMode('back')">상대 색상 위로</button>
+        <div id="controls">
+            <div style="display:flex; gap:5px;">
+                <button id="btn-front" class="active-mode" onclick="setPlaceMode('front')">내 색상 위로</button>
+                <button id="btn-back" onclick="setPlaceMode('back')">상대 색상 위로</button>
             </div>
-            <button id="btn-ready" class="primary" onclick="handleReady()">준비하기</button>
-            <button id="btn-start" style="display:none;" onclick="handleStart()">게임 시작</button>
-            <button onclick="exitRoom()" style="background: #555;">방 나가기</button>
+            <button id="btn-ready" class="primary" onclick="handleReady()">준비 / 시작</button>
+            <button onclick="location.reload()" style="background:#444;">로비로 나가기</button>
         </div>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-        import { getFirestore, doc, setDoc, getDoc, onSnapshot, updateDoc, arrayUnion } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { getAuth, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        import { getFirestore, doc, setDoc, getDoc, onSnapshot, updateDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyDcKWKTei9L2Sat-XxinlXknabIcHgmjGs",
@@ -107,18 +92,26 @@
         const db = getFirestore(app);
         const provider = new GoogleAuthProvider();
 
-        let userData = { uid: '', nickname: '' };
-        let currentGame = { id: null, role: '', mode: 'front', isAI: false };
+        let state = {
+            user: { uid: '', nick: 'Guest' },
+            game: { id: null, isAI: false, role: 'host', mode: 'front', board: Array(16).fill(null), turn: 'host', status: 'waiting' }
+        };
 
-        // [인증 로직]
+        // --- 화면 전환 함수 ---
+        function showScreen(id) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+        }
+
+        // --- 1. 인증 로직 ---
         window.handleGoogleLogin = async () => {
             const res = await signInWithPopup(auth, provider);
-            const userDoc = await getDoc(doc(db, "users", res.user.uid));
-            userData.uid = res.user.uid;
-            if (userDoc.exists()) {
-                userData.nickname = userDoc.data().nickname;
-                switchScreen('screen-lobby');
-                document.getElementById('display-user').innerText = `${userData.nickname}님 환영합니다`;
+            state.user.uid = res.user.uid;
+            const docSnap = await getDoc(doc(db, "users", res.user.uid));
+            if (docSnap.exists()) {
+                state.user.nick = docSnap.data().nickname;
+                document.getElementById('display-user').innerText = `${state.user.nick}님 환영합니다`;
+                showScreen('screen-lobby');
             } else {
                 document.getElementById('login-form').style.display = 'none';
                 document.getElementById('nick-form').style.display = 'block';
@@ -128,134 +121,154 @@
         window.handleSaveNickname = async () => {
             const nick = document.getElementById('input-nickname').value;
             if (nick.length < 2) return alert("2자 이상 입력하세요.");
-            await setDoc(doc(db, "users", userData.uid), { nickname: nick });
-            userData.nickname = nick;
+            await setDoc(doc(db, "users", state.user.uid), { nickname: nick });
             location.reload();
         };
 
-        // [방 시스템 로직]
+        // --- 2. AI 모드 (싱글) ---
+        window.startAIMode = () => {
+            state.game.isAI = true;
+            state.game.status = 'playing';
+            state.game.role = 'host';
+            showScreen('screen-game');
+            document.getElementById('room-info').innerText = "AI PRACTICE MODE";
+            document.getElementById('p1-label').innerText = `P1(YOU): ${state.user.nick}`;
+            document.getElementById('p2-label').innerText = `P2(AI): 컴퓨터`;
+            renderBoard();
+        };
+
+        // --- 3. 온라인 모드 ---
         window.handleCreateRoom = async () => {
-            const roomId = Math.random().toString(36).substring(2, 7).toUpperCase();
-            await setDoc(doc(db, "rooms", roomId), {
-                status: 'waiting',
-                host: { uid: userData.uid, nick: userData.nickname, ready: false },
-                guest: null,
-                board: Array(16).fill(null),
-                turn: 'host'
+            const rid = Math.random().toString(36).substring(2, 7).toUpperCase();
+            state.game.id = rid;
+            state.game.role = 'host';
+            await setDoc(doc(db, "rooms", rid), {
+                board: Array(16).fill(null), status: 'waiting', turn: 'host',
+                host: { nick: state.user.nick, ready: false }, guest: null
             });
-            joinRoomLogic(roomId, 'host');
+            initOnlineGame(rid);
         };
 
         window.handleJoinRoom = async (role) => {
-            const roomId = document.getElementById('input-roomid').value.toUpperCase();
-            if (!roomId) return alert("방 코드를 입력하세요.");
-            const roomRef = doc(db, "rooms", roomId);
-            const snap = await getDoc(roomRef);
-            if (!snap.exists()) return alert("존재하지 않는 방입니다.");
-
-            if (role === 'guest') {
-                await updateDoc(roomRef, { guest: { uid: userData.uid, nick: userData.nickname, ready: false } });
-            } else if (role === 'spectator') {
-                await updateDoc(roomRef, { spectators: arrayUnion({ nick: userData.nickname }) });
+            const rid = document.getElementById('input-roomid').value.toUpperCase();
+            if(!rid) return alert("코드를 입력하세요.");
+            state.game.id = rid;
+            state.game.role = role;
+            if(role === 'guest') {
+                await updateDoc(doc(db, "rooms", rid), { guest: { nick: state.user.nick, ready: false }});
             }
-            joinRoomLogic(roomId, role);
+            initOnlineGame(rid);
         };
 
-        function joinRoomLogic(roomId, role) {
-            currentGame.id = roomId;
-            currentGame.role = role;
-            switchScreen('screen-game');
-            document.getElementById('room-id-display').innerText = `ROOM: ${roomId} (${role})`;
-            
-            // 실시간 리스너
-            onSnapshot(doc(db, "rooms", roomId), (snap) => {
+        function initOnlineGame(rid) {
+            showScreen('screen-game');
+            document.getElementById('room-info').innerText = `ROOM: ${rid}`;
+            onSnapshot(doc(db, "rooms", rid), (snap) => {
                 const data = snap.data();
-                if (!data) return;
-                updateGameUI(data);
+                if(!data) return;
+                state.game.board = data.board;
+                state.game.turn = data.turn;
+                state.game.status = data.status;
+                updateUI(data);
+                renderBoard();
             });
         }
 
-        // [게임 플레이 로직]
-        function updateGameUI(data) {
-            const boardEl = document.getElementById('board');
-            boardEl.innerHTML = '';
-            data.board.forEach((cell, i) => {
-                const div = document.createElement('div');
-                div.className = 'cell';
-                if (cell) div.classList.add(cell.top === 'host' ? 'top-p1' : 'top-p2');
-                div.onclick = () => makeMove(i, data);
-                boardEl.appendChild(div);
+        // --- 4. 게임 핵심 로직 ---
+        window.setPlaceMode = (m) => {
+            state.game.mode = m;
+            document.getElementById('btn-front').className = m === 'front' ? 'active-mode' : '';
+            document.getElementById('btn-back').className = m === 'back' ? 'active-mode' : '';
+        };
+
+        function renderBoard() {
+            const b = document.getElementById('board');
+            b.innerHTML = '';
+            state.game.board.forEach((cell, i) => {
+                const d = document.createElement('div');
+                d.className = 'cell' + (cell ? (cell.top === 'host' ? ' top-p1' : ' top-p2') : '');
+                d.onclick = () => handleMove(i);
+                b.appendChild(d);
             });
+        }
 
-            document.getElementById('p1-nick').innerText = `RED(H): ${data.host.nick} ${data.host.ready ? '✅' : ''}`;
-            document.getElementById('p2-nick').innerText = data.guest ? `BLUE(G): ${data.guest.nick} ${data.guest.ready ? '✅' : ''}` : 'BLUE: 대기 중';
+        async function handleMove(idx) {
+            if (state.game.status !== 'playing' || state.game.board[idx]) return;
+            if (state.game.turn !== state.game.role) return;
 
-            // 방장 시작 버튼 제어
-            if (currentGame.role === 'host' && data.host?.ready && data.guest?.ready && data.status === 'waiting') {
-                document.getElementById('btn-start').style.display = 'block';
-            }
+            // 말 놓기 계산
+            const isHost = state.game.role === 'host';
+            const topSide = state.game.mode === 'front' ? state.game.role : (isHost ? 'guest' : 'host');
+            const newBoard = [...state.game.board];
+            newBoard[idx] = { top: topSide };
 
-            if (data.status === 'playing') {
-                document.getElementById('game-status').innerText = `${data.turn === 'host' ? 'RED' : 'BLUE'} 차례입니다`;
-                document.getElementById('btn-ready').style.display = 'none';
-                document.getElementById('btn-start').style.display = 'none';
+            if (state.game.isAI) {
+                state.game.board = newBoard;
+                state.game.turn = 'guest';
+                renderBoard();
+                if (!checkBingo(newBoard)) setTimeout(aiMove, 800);
+            } else {
+                await updateDoc(doc(db, "rooms", state.game.id), {
+                    board: newBoard, turn: isHost ? 'guest' : 'host'
+                });
             }
         }
 
-        async function makeMove(idx, data) {
-            if (data.status !== 'playing' || data.board[idx] || currentGame.role === 'spectator') return;
-            if (data.turn !== currentGame.role) return alert("당신의 차례가 아닙니다!");
-
-            const newBoard = [...data.board];
-            const isHost = currentGame.role === 'host';
-            newBoard[idx] = {
-                top: currentGame.mode === 'front' ? currentGame.role : (isHost ? 'guest' : 'host')
-            };
-
-            await updateDoc(doc(db, "rooms", currentGame.id), {
-                board: newBoard,
-                turn: isHost ? 'guest' : 'host'
-            });
-            
-            checkWinner(newBoard);
+        function aiMove() {
+            const empties = state.game.board.map((v, i) => v === null ? i : null).filter(v => v !== null);
+            if (empties.length === 0) return;
+            const move = empties[Math.floor(Math.random() * empties.length)];
+            // AI는 80% 확률로 본인 색상을 위로 놓음
+            const aiTop = Math.random() > 0.2 ? 'guest' : 'host';
+            state.game.board[move] = { top: aiTop };
+            state.game.turn = 'host';
+            renderBoard();
+            checkBingo(state.game.board);
         }
 
         window.handleReady = async () => {
-            const roomRef = doc(db, "rooms", currentGame.id);
-            const snap = await getDoc(roomRef);
-            const data = snap.data();
-            if (currentGame.role === 'host') await updateDoc(roomRef, { "host.ready": !data.host.ready });
-            if (currentGame.role === 'guest') await updateDoc(roomRef, { "guest.ready": !data.guest.ready });
+            if (state.game.isAI) return; // AI 모드에선 바로 시작됨
+            const rRef = doc(db, "rooms", state.game.id);
+            const s = await getDoc(rRef);
+            const d = s.data();
+            if (state.game.role === 'host') {
+                if (d.guest && d.host.ready && d.guest.ready) await updateDoc(rRef, { status: 'playing' });
+                else await updateDoc(rRef, { "host.ready": !d.host.ready });
+            } else {
+                await updateDoc(rRef, { "guest.ready": !d.guest.ready });
+            }
         };
 
-        window.handleStart = async () => {
-            await updateDoc(doc(db, "rooms", currentGame.id), { status: 'playing' });
-        };
-
-        // [유틸리티]
-        function switchScreen(id) {
-            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-            document.getElementById(id).classList.add('active');
+        function updateUI(data) {
+            document.getElementById('p1-label').innerText = `P1(RED): ${data.host.nick} ${data.host.ready ? '✅' : ''}`;
+            document.getElementById('p2-label').innerText = data.guest ? `P2(BLUE): ${data.guest.nick} ${data.guest.ready ? '✅' : ''}` : 'P2: 대기중...';
+            
+            if (data.status === 'playing') {
+                document.getElementById('game-status').innerText = data.turn === 'host' ? "RED 차례" : "BLUE 차례";
+                document.getElementById('btn-ready').style.display = 'none';
+            } else {
+                document.getElementById('game-status').innerText = "대기실";
+                if(state.game.role === 'host' && data.host.ready && data.guest?.ready) document.getElementById('btn-ready').innerText = "게임 시작하기";
+            }
+            checkBingo(data.board);
         }
 
-        window.setPlaceMode = (mode) => {
-            currentGame.mode = mode;
-            document.getElementById('btn-front').classList.toggle('ready', mode === 'front');
-            document.getElementById('btn-back').classList.toggle('ready', mode === 'back');
-        };
-
-        window.showTutorial = () => {
-            alert("양면빙고 규칙:\n1. 4x4 판에 네모 말을 놓습니다.\n2. 말은 앞뒤 색이 다릅니다.\n3. 내 색상이 위로 가게 놓거나, 상대 색상이 위로 가게 놓을 수 있습니다.\n4. 가로/세로/대각선 4칸을 내 테두리색으로 맞추면 승리!");
-        };
-
-        // 승리 판정 알고리즘
-        function checkWinner(board) {
+        function checkBingo(board) {
             const lines = [
                 [0,1,2,3],[4,5,6,7],[8,9,10,11],[12,13,14,15], // 가로
                 [0,4,8,12],[1,5,9,13],[2,6,10,14],[3,7,11,15], // 세로
                 [0,5,10,15],[3,6,9,12] // 대각선
             ];
-            // 승리 시 status를 'finished'로 바꾸고 알림 로직 추가 가능
+            for (let l of lines) {
+                const players = l.map(i => board[i]?.top);
+                if (players.every(p => p === 'host') || players.every(p => p === 'guest')) {
+                    const winner = players[0] === 'host' ? 'RED' : 'BLUE';
+                    alert(`게임 종료! 승자: ${winner}`);
+                    state.game.status = 'finished';
+                    return true;
+                }
+            }
+            return false;
         }
     </script>
 </body>
