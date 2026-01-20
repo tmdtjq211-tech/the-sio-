@@ -3,39 +3,38 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>UNIVERSITY WAR: BINGO PRO v14.0 FULL</title>
+    <title>UNIVERSITY WAR: BINGO PRO v18.0 FULL</title>
     <style>
         :root { --bg: #0a0c14; --panel: #161b2a; --red: #ff4d4d; --yellow: #ffd700; --blue: #4d79ff; --hl: #ffffff; }
         body { background: var(--bg); color: #fff; font-family: 'Pretendard', sans-serif; margin: 0; display: flex; flex-direction: column; align-items: center; min-height: 100vh; overflow: hidden; }
         .screen { display: none; width: 100%; max-width: 480px; padding: 20px; text-align: center; box-sizing: border-box; height: 100vh; overflow-y: auto; }
         .active { display: block; }
 
-        /* 결과/매칭 오버레이 */
+        /* 공통 레이어 디자인 */
         .overlay-box { background: var(--panel); padding: 35px 20px; border-radius: 20px; border: 1px solid #333; margin-top: 50px; box-shadow: 0 10px 40px rgba(0,0,0,0.6); }
-        .pulse { animation: pulse 1.5s infinite; color: var(--blue); font-weight: bold; }
+        .pulse { animation: pulse 1.5s infinite; color: var(--blue); }
         @keyframes pulse { 0% { opacity: 0.5; } 50% { opacity: 1; } 100% { opacity: 0.5; } }
 
-        /* 가위바위보 */
+        /* 가위바위보 버튼 */
         .rps-btns { display: flex; justify-content: space-around; margin: 25px 0; }
         .rps-btn { font-size: 2.5rem; background: #222; border: 2px solid #444; padding: 15px; border-radius: 15px; cursor: pointer; transition: 0.2s; }
-        .rps-btn:hover { background: #333; transform: scale(1.1); }
         .rps-btn.selected { border-color: var(--blue); box-shadow: 0 0 15px var(--blue); }
 
-        /* 보드 및 말 */
+        /* 게임 보드 및 말 */
         .board { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; background: #222639; padding: 15px; border-radius: 15px; margin: 10px 0; }
         .cell { aspect-ratio: 1/1; background: #1a1c2c; border: 1px solid #3f445e; border-radius: 10px; cursor: pointer; display: flex; align-items: center; justify-content: center; position: relative; }
         .cell.last-act { outline: 4px solid var(--hl); outline-offset: 3px; z-index: 5; }
-        .cell.win-line { background: rgba(0, 200, 83, 0.4) !important; border-color: #00c853 !important; box-shadow: inset 0 0 10px #00c853; }
+        .cell.win-line { background: rgba(0, 200, 83, 0.4) !important; border-color: #00c853 !important; }
         .cell.move-ready { background: rgba(77, 121, 255, 0.4); box-shadow: inset 0 0 15px var(--blue); }
         
-        .piece { width: 85%; height: 85%; border-radius: 8px; box-sizing: border-box; border-width: 7px; border-style: solid; transition: transform 0.3s; }
+        .piece { width: 85%; height: 85%; border-radius: 8px; box-sizing: border-box; border-width: 7px; border-style: solid; }
         .bg-red { background-color: var(--red); } .bd-red { border-color: var(--red); }
         .bg-yellow { background-color: var(--yellow); } .bd-yellow { border-color: var(--yellow); }
         .bg-blue { background-color: var(--blue); } .bd-blue { border-color: var(--blue); }
 
         /* 인벤토리 */
         .inventory { display: flex; justify-content: space-around; background: var(--panel); padding: 12px; border-radius: 12px; border: 1px solid #333; margin-top: 5px; }
-        .inv-item { cursor: pointer; padding: 8px; border-radius: 10px; opacity: 0.4; transition: 0.3s; text-align: center; }
+        .inv-item { cursor: pointer; padding: 8px; border-radius: 10px; opacity: 0.4; transition: 0.3s; }
         .inv-item.selected { opacity: 1; box-shadow: 0 0 20px rgba(255, 255, 255, 0.4); background: rgba(255,255,255,0.1); }
         .inv-preview { width: 45px; height: 45px; border-radius: 8px; border-width: 6px; border-style: solid; margin: 0 auto 5px; }
 
@@ -43,8 +42,7 @@
         .score-dot { width: 14px; height: 14px; border-radius: 50%; background: #333; margin: 0 4px; display: inline-block; }
         .score-dot.win { background: #00c853; box-shadow: 0 0 10px #00c853; }
 
-        button { background: #2d334d; color: white; border: 1px solid #444; padding: 14px; border-radius: 8px; cursor: pointer; width: 100%; margin: 6px 0; font-weight: bold; font-size: 1rem; transition: 0.2s; }
-        button:active { transform: scale(0.98); }
+        button { background: #2d334d; color: white; border: 1px solid #444; padding: 14px; border-radius: 8px; cursor: pointer; width: 100%; margin: 6px 0; font-weight: bold; font-size: 1rem; }
         .primary { background: var(--blue); border: none; }
         .btn-act { background: #00c853 !important; border-color: #fff !important; }
     </style>
@@ -52,41 +50,38 @@
 <body>
 
     <div id="screen-lobby" class="screen active">
-        <h1 style="letter-spacing: 5px; margin-bottom: 30px;">UNIVERSITY WAR</h1>
-        <div id="lobby-main">
-            <input type="text" id="nick-in" placeholder="플레이어 닉네임" style="width:100%; padding:14px; margin-bottom:12px; background:#111; border:1px solid #444; color:#fff; border-radius:8px; box-sizing:border-box;">
-            <button onclick="initGame('ai')" class="primary">초지능 AI 대결 (연습)</button>
-            <hr style="border: 0.5px solid #333; margin: 20px 0;">
-            <input type="text" id="room-in" placeholder="방 코드 입력" style="width:100%; padding:14px; margin-bottom:12px; background:#111; border:1px solid #444; color:#fff; border-radius:8px; box-sizing:border-box;">
-            <button onclick="initGame('online')">멀티플레이 매칭 입장</button>
-        </div>
+        <h1>UNIVERSITY WAR</h1>
+        <input type="text" id="nick-in" placeholder="닉네임" style="width:100%; padding:14px; margin-bottom:12px; background:#111; border:1px solid #444; color:#fff; border-radius:8px;">
+        <button onclick="initGame('ai')" class="primary">AI 대결 (학습형)</button>
+        <hr style="border: 0.5px solid #333; margin: 20px 0;">
+        <input type="text" id="room-in" placeholder="방 코드 입력" style="width:100%; padding:14px; margin-bottom:12px; background:#111; border:1px solid #444; color:#fff; border-radius:8px;">
+        <button onclick="initGame('online')">온라인 대전 입장</button>
     </div>
 
     <div id="screen-matching" class="screen">
         <div class="overlay-box">
-            <h2 class="pulse">상대방을 기다리는 중...</h2>
-            <p id="room-id-txt" style="background:#222; padding:10px; border-radius:8px; margin: 20px 0;"></p>
-            <button onclick="location.reload()" style="background:#444;">매칭 취소</button>
+            <h2 class="pulse">상대방을 찾는 중...</h2>
+            <p id="room-id-txt"></p>
+            <button onclick="location.reload()">취소</button>
         </div>
     </div>
 
     <div id="screen-rps" class="screen">
         <div class="overlay-box">
-            <h2 id="rps-title">가위바위보</h2>
-            <p>승리자가 선공(RED)/후공(BLUE)을 결정합니다.</p>
+            <h2>가위바위보</h2>
+            <p>선공권을 결정합니다.</p>
             <div class="rps-btns">
                 <div class="rps-btn" id="rps-v" onclick="submitRPS('✌️')">✌️</div>
                 <div class="rps-btn" id="rps-r" onclick="submitRPS('✊')">✊</div>
                 <div class="rps-btn" id="rps-p" onclick="submitRPS('🖐️')">🖐️</div>
             </div>
-            <div id="rps-status" style="color:#888; font-size:0.9rem;">상대방이 선택 중입니다...</div>
+            <div id="rps-status" style="color:#888;">상대방 선택 대기 중...</div>
         </div>
     </div>
 
     <div id="screen-choice" class="screen">
         <div class="overlay-box">
             <h2 style="color:#00c853;">가위바위보 승리!</h2>
-            <p>원하는 역할을 선택하세요.</p>
             <button class="primary" onclick="confirmRole('host')">선공 (RED) 선택</button>
             <button style="background:var(--blue);" onclick="confirmRole('guest')">후공 (BLUE) 선택</button>
         </div>
@@ -94,13 +89,13 @@
 
     <div id="screen-game" class="screen">
         <div class="scoreboard">
-            <div><span id="p1-name" style="font-size:0.8rem; color:#aaa;">PLAYER 1</span><br><div id="p1-dots"></div></div>
-            <div style="font-weight: bold; color: #555;">VS</div>
-            <div><span id="p2-name" style="font-size:0.8rem; color:#aaa;">PLAYER 2</span><br><div id="p2-dots"></div></div>
+            <div><span id="p1-name">YOU</span><br><div id="p1-dots"></div></div>
+            <div>VS</div>
+            <div><span id="p2-name">OPP</span><br><div id="p2-dots"></div></div>
         </div>
         <div id="status-bar" style="background:var(--panel); padding:10px; border-radius:12px; margin-bottom:10px; border-left:5px solid var(--blue); text-align:left;">
             <div id="turn-txt" style="font-weight:bold; color:var(--blue);">제 1턴</div>
-            <div id="target-txt" style="font-size:0.9rem; margin-top:3px;">내 목표 색상: <span id="my-target-color" style="font-weight:bold;">-</span></div>
+            <div id="target-txt">내 목표: <span id="my-target-color">-</span></div>
         </div>
         <div class="board" id="board"></div>
         <div id="phase2-ui" style="display:none; gap:6px; margin-bottom:10px;">
@@ -109,14 +104,14 @@
             <button id="act-f" onclick="setAct('flip')">뒤집기</button>
         </div>
         <div class="inventory" id="inv-ui"></div>
-        <button style="background:#444; font-size:0.85rem; margin-top:10px;" onclick="flipSelected()">내 말 뒤집기 (앞면 선택)</button>
+        <button style="background:#444; font-size:0.9rem; margin-top:10px;" onclick="flipSelected()">내 말 뒤집기</button>
     </div>
 
     <div id="screen-result" class="screen">
         <div class="overlay-box">
-            <h1 id="res-win-title" style="font-size:2rem; margin-bottom:10px;">RESULT</h1>
-            <div id="res-desc" style="line-height:1.6; margin-bottom:20px;"></div>
-            <h2 id="res-score-board" style="letter-spacing:5px; background:#111; padding:10px; border-radius:10px;">0 : 0</h2>
+            <h1 id="res-win-title">RESULT</h1>
+            <p id="res-desc" style="margin: 20px 0;"></p>
+            <h2 id="res-score-board" style="background:#111; padding:15px; border-radius:10px;">0 : 0</h2>
             <button class="primary" id="res-next-btn" style="margin-top:20px;" onclick="nextRoundAction()">다음 라운드 시작</button>
         </div>
     </div>
@@ -125,120 +120,157 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { getFirestore, doc, setDoc, getDoc, onSnapshot, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-        // 파이어베이스 설정
         const firebaseConfig = { apiKey: "AIzaSyDcKWKTei9L2Sat-XxinlXknabIcHgmjGs", authDomain: "d454545-ac9b1.firebaseapp.com", projectId: "d454545-ac9b1", storageBucket: "d454545-ac9b1.firebasestorage.app", messagingSenderId: "438189498590", appId: "1:438189498590:web:5c515415a9aa1f2b5aa24f" };
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
         const PIECE_TYPES = [['red', 'yellow'], ['yellow', 'blue'], ['blue', 'red']];
-        let g = { 
-            room:'', role:'', isAI:false, target:'', aiTarget:'', turn:1, lastIdx:-1, 
-            board:Array(16).fill(null), inv:[], aiInv:[], selIdx:0, act:'place', 
-            scores:{host:0, guest:0}, winLine:[], mFrom:null, nick:'' 
-        };
+        let g = { room:'', role:'', isAI:false, target:'', aiTarget:'', turn:1, lastIdx:-1, board:Array(16).fill(null), inv:[], aiInv:[], selIdx:0, act:'place', scores:{host:0, guest:0}, winLine:[], learningData:{lines:Array(10).fill(0)} };
 
         const getNewInv = () => PIECE_TYPES.map(t => ({ sides: t, count: 3, top: 0 }));
 
-        // --- 초기화 및 화면 전환 ---
+        // --- 초기화 및 온라인 연동 ---
         window.initGame = async (mode) => {
-            g.nick = document.getElementById('nick-in').value || 'Guest';
-            g.inv = getNewInv(); g.aiInv = getNewInv();
-            
+            const nick = document.getElementById('nick-in').value || 'Guest';
+            g.nick = nick; g.inv = getNewInv(); g.aiInv = getNewInv();
+
             if(mode === 'ai') {
                 g.isAI = true; switchScreen('screen-rps');
             } else {
                 g.room = document.getElementById('room-in').value.toUpperCase();
                 if(!g.room) return alert("방 코드를 입력하세요.");
                 
-                const ref = doc(db, "war_un_v14", g.room);
+                const ref = doc(db, "unwar_v18", g.room);
                 const snap = await getDoc(ref);
                 
                 if(!snap.exists()) {
                     g.role = 'host';
-                    await setDoc(ref, { status:'waiting', host:{nick:g.nick, rps:null, score:0}, guest:null });
+                    await setDoc(ref, { status:'waiting', host:{nick, rps:null, score:0}, guest:null });
                     switchScreen('screen-matching');
                     document.getElementById('room-id-txt').innerText = `방 코드: ${g.room}`;
                 } else {
-                    const data = snap.data();
-                    if(data.guest) return alert("이미 가득 찬 방입니다.");
                     g.role = 'guest';
-                    await updateDoc(ref, { status:'rps', guest:{nick:g.nick, rps:null, score:0} });
+                    await updateDoc(ref, { status:'rps', guest:{nick, rps:null, score:0} });
                 }
                 
                 onSnapshot(ref, (s) => {
                     const d = s.data(); if(!d) return;
                     if(d.status === 'rps') switchScreen('screen-rps');
                     if(d.status === 'choice' && d.winner === g.role) switchScreen('screen-choice');
-                    if(d.status === 'playing') { switchScreen('screen-game'); syncOnlineData(d); }
-                    if(d.status === 'rps' && g.role === 'host') checkRPSResult(d);
-                    if(d.status === 'result') showGameResult(d.winColor, d);
+                    if(d.status === 'playing') { switchScreen('screen-game'); sync(d); }
+                    if(d.status === 'rps' && g.role === 'host') checkRPS(d);
+                    if(d.status === 'result') showResult(d.winColor, d);
                 });
             }
         };
 
-        // --- 가위바위보 및 선공 결정 ---
+        // --- 가위바위보 & 선공 선택 ---
         window.submitRPS = async (choice) => {
-            document.querySelectorAll('.rps-btn').forEach(b => b.classList.remove('selected'));
-            if(choice === '✌️') document.getElementById('rps-v').classList.add('selected');
-            if(choice === '✊') document.getElementById('rps-r').classList.add('selected');
-            if(choice === '🖐️') document.getElementById('rps-p').classList.add('selected');
-
             if(g.isAI) {
                 const ai = ['✌️','✊','🖐️'][Math.floor(Math.random()*3)];
-                if(choice === ai) return alert(`무승부! 다시 선택하세요. (AI: ${ai})`);
+                if(choice === ai) return alert("무승부!");
                 const win = (choice==='✊'&&ai==='✌️') || (choice==='✌️'&&ai==='🖐️') || (choice==='🖐️'&&ai==='✊');
-                if(win) switchScreen('screen-choice');
-                else { alert(`패배! AI가 선공(RED)을 선택했습니다.`); g.role = 'guest'; startAIBattle(); }
+                win ? switchScreen('screen-choice') : (g.role = 'guest', startAIGame());
             } else {
                 const p = g.role === 'host' ? 'host.rps' : 'guest.rps';
-                await updateDoc(doc(db, "war_un_v14", g.room), { [p]: choice });
+                await updateDoc(doc(db, "unwar_v18", g.room), { [p]: choice });
             }
         };
 
-        async function checkRPSResult(d) {
+        async function checkRPS(d) {
             if(d.host.rps && d.guest.rps) {
                 if(d.host.rps === d.guest.rps) {
-                    await updateDoc(doc(db, "war_un_v14", g.room), { "host.rps":null, "guest.rps":null });
+                    await updateDoc(doc(db, "unwar_v18", g.room), { "host.rps":null, "guest.rps":null });
                     return;
                 }
                 const hWin = (d.host.rps==='✊'&&d.guest.rps==='✌️') || (d.host.rps==='✌️'&&d.guest.rps==='🖐️') || (d.host.rps==='🖐️'&&d.guest.rps==='✊');
-                await updateDoc(doc(db, "war_un_v14", g.room), { status:'choice', winner: hWin ? 'host' : 'guest' });
+                await updateDoc(doc(db, "unwar_v18", g.room), { status:'choice', winner: hWin ? 'host' : 'guest' });
             }
         }
 
-        window.confirmRole = async (roleChoice) => {
-            if(g.isAI) { g.role = roleChoice; startAIBattle(); }
+        window.confirmRole = async (r) => {
+            if(g.isAI) { g.role = r; startAIGame(); }
             else {
-                const colors = ['red', 'yellow', 'blue'].sort(() => Math.random() - 0.5);
-                const first = roleChoice === 'host' ? 'host' : 'guest';
+                const cols = ['red', 'yellow', 'blue'].sort(() => Math.random() - 0.5);
+                const first = r === 'host' ? 'host' : 'guest';
                 const second = first === 'host' ? 'guest' : 'host';
-                await updateDoc(doc(db, "war_un_v14", g.room), {
+                await updateDoc(doc(db, "unwar_v18", g.room), {
                     status: 'playing', turn: 1, board: Array(16).fill(null), lastIdx: -1,
-                    [`${first}.target`]: colors[0], [`${second}.target`]: colors[1],
+                    [`${first}.target`]: cols[0], [`${second}.target`]: cols[1],
                     [`${first}.inv`]: getNewInv(), [`${second}.inv`]: getNewInv()
                 });
             }
         };
 
-        function startAIBattle() {
-            const colors = ['red', 'yellow', 'blue'].sort(() => Math.random() - 0.5);
-            g.target = colors[0]; g.aiTarget = colors[1];
+        function startAIGame() {
+            const cols = ['red', 'yellow', 'blue'].sort(() => Math.random() - 0.5);
+            g.target = cols[0]; g.aiTarget = colors[1];
             switchScreen('screen-game'); renderAll();
         }
 
-        // --- 실시간 게임 로직 ---
-        function syncOnlineData(d) {
+        // --- [AI] 자원 제한 및 고지능 로직 ---
+        function aiTurn() {
+            setTimeout(() => {
+                let move = findWinning(g.aiTarget, g.aiInv) || findWinning(g.target, g.aiInv) || getStrategicMove(g.aiInv);
+                if(move) executeAI(move);
+            }, 800);
+        }
+
+        function findWinning(color, inv) {
+            // 뒤집기 승리
+            if(g.turn >= 15) {
+                for(let i=0; i<16; i++) {
+                    if(g.board[i] && i !== g.lastIdx) {
+                        let tb = JSON.parse(JSON.stringify(g.board));
+                        tb[i].top = g.board[i].bottom; tb[i].bottom = g.board[i].top;
+                        if(checkBingo(tb) === color) return { type:'flip', idx:i };
+                    }
+                }
+            }
+            // 착수 승리 (자원 체크)
+            for(let i=0; i<16; i++) {
+                if(!g.board[i]) {
+                    let tb = [...g.board]; tb[i] = { top: color };
+                    if(checkBingo(tb) === color) {
+                        const itIdx = inv.findIndex(it => it.sides.includes(color) && it.count > 0);
+                        if(itIdx !== -1) return { type: 'place', idx: i, invIdx: itIdx };
+                    }
+                }
+            }
+            return null;
+        }
+
+        function getStrategicMove(inv) {
+            const emps = g.board.map((v,i)=>v===null?i:null).filter(v=>v!==null);
+            const idx = emps.filter(i => [5,6,9,10].includes(i)).length > 0 ? emps.filter(i => [5,6,9,10].includes(i))[0] : emps[0];
+            const invIdx = inv.findIndex(it => it.count > 0);
+            return invIdx !== -1 ? { type: 'place', idx, invIdx } : null;
+        }
+
+        function executeAI(a) {
+            if(a.type === 'place') {
+                const it = g.aiInv[a.invIdx];
+                const top = it.sides.includes(g.aiTarget) ? g.aiTarget : it.sides[0];
+                g.board[a.idx] = { top, bottom: it.sides.find(c => c!==top) }; it.count--;
+            } else if(a.type === 'flip') {
+                const p = g.board[a.idx]; g.board[a.idx] = { top: p.bottom, bottom: p.top };
+            }
+            g.turn++; g.lastIdx = a.idx;
+            const win = checkBingo(g.board); if(win) showResult(win); else renderAll();
+        }
+
+        // --- 온라인 동기화 ---
+        function sync(d) {
             g.board = d.board; g.turn = d.turn; g.lastIdx = d.lastIdx;
             g.scores = { host: d.host.score, guest: d.guest.score };
             const me = g.role === 'host' ? d.host : d.guest;
-            const opp = g.role === 'host' ? d.guest : d.host;
-            if(me && me.target) { g.target = me.target; g.inv = me.inv; renderAll(me.nick, opp.nick); }
+            if(me && me.target) { g.target = me.target; g.inv = me.inv; renderAll(me.nick); }
         }
 
         window.handleMove = async (idx) => {
             const isMe = (g.turn % 2 === 1 && g.role === 'host') || (g.turn % 2 === 0 && g.role === 'guest') || (g.isAI && g.turn % 2 === 1);
             if(!isMe) return;
-            if(idx === g.lastIdx && g.act !== 'place') return alert("상대가 방금 조작한 말은 보호됩니다.");
+            if(idx === g.lastIdx && g.act !== 'place') return alert("방어 규칙 적용 칸입니다.");
 
             let ok = false;
             if(g.act === 'place' && !g.board[idx]) {
@@ -246,122 +278,52 @@
                 g.board[idx] = { top: it.sides[it.top], bottom: it.sides[1-it.top] }; it.count--; ok = true;
             } else if(g.act === 'flip' && g.board[idx] && g.turn >= 15) {
                 const p = g.board[idx]; g.board[idx] = { top: p.bottom, bottom: p.top }; ok = true;
-            } else if(g.act === 'move' && g.turn >= 15) {
-                if(g.mFrom === null) { if(g.board[idx]) { g.mFrom = idx; renderAll(); } return; }
-                else if(!g.board[idx] && [1,4].includes(Math.abs(g.mFrom-idx))) {
-                    g.board[idx] = g.board[g.mFrom]; g.board[g.mFrom] = null; ok = true; g.mFrom = null;
-                } else { g.mFrom = null; renderAll(); return; }
-            } else if(g.turn < 15 && g.act !== 'place') return alert("15턴부터 가능한 전략 행동입니다.");
+            }
 
             if(ok) {
-                const winCol = checkBingo(g.board);
-                if(g.isAI) {
-                    if(winCol) showGameResult(winCol);
-                    else { g.turn++; g.lastIdx = idx; renderAll(); setTimeout(aiProfessionalThink, 800); }
-                } else {
-                    const ref = doc(db, "war_un_v14", g.room);
-                    if(winCol) {
-                        const winnerRole = (winCol === g.target) ? g.role : (g.role === 'host' ? 'guest' : 'host');
-                        const newScore = g.scores[winnerRole] + 1;
-                        await updateDoc(ref, { status:'result', winColor: winCol, [`${winnerRole}.score`]: newScore, board: g.board, lastIdx: idx });
+                const win = checkBingo(g.board);
+                if(g.isAI) { if(win) showResult(win); else { g.turn++; g.lastIdx = idx; renderAll(); aiTurn(); } }
+                else {
+                    const ref = doc(db, "unwar_v18", g.room);
+                    if(win) {
+                        const winnerRole = (win === g.target) ? g.role : (g.role==='host'?'guest':'host');
+                        await updateDoc(ref, { status:'result', winColor: win, [`${winnerRole}.score`]: g.scores[winnerRole]+1, board:g.board, lastIdx:idx });
                     } else {
-                        const pKey = g.role === 'host' ? 'host' : 'guest';
-                        await updateDoc(ref, { board: g.board, turn: g.turn + 1, lastIdx: idx, [`${pKey}.inv`]: g.inv });
+                        await updateDoc(ref, { board: g.board, turn: g.turn+1, lastIdx: idx, [`${g.role === 'host' ? 'host' : 'guest'}.inv`]: g.inv });
                     }
                 }
             }
         };
 
-        // --- 필승법을 아는 빌런 AI ---
-        function aiProfessionalThink() {
-            let move = findWinningAction(g.aiTarget) || findWinningAction(g.target) || { idx: findStrategicIdx(), type:'place' };
-            const itIdx = PIECE_TYPES.findIndex(t => t.includes(g.aiTarget));
-            const it = g.aiInv[itIdx !== -1 ? itIdx : 0];
-            const topSide = it.sides.includes(g.aiTarget) ? g.aiTarget : it.sides[0];
-            
-            if(move.type === 'place') {
-                g.board[move.idx] = { top: topSide, bottom: it.sides.find(c => c !== topSide) };
-                it.count--;
-            } else if(move.type === 'flip') {
-                const p = g.board[move.idx]; g.board[move.idx] = { top: p.bottom, bottom: p.top };
-            }
-            
-            g.turn++; g.lastIdx = move.idx;
-            const win = checkBingo(g.board);
-            if(win) showGameResult(win); else renderAll();
+        function checkBingo(b) {
+            const lines = [[0,1,2,3],[4,5,6,7],[8,9,10,11],[12,13,14,15],[0,4,8,12],[1,5,9,13],[2,6,10,14],[3,7,11,15],[0,5,10,15],[3,6,9,12]];
+            for(let l of lines) { const ts = l.map(i=>b[i]?.top); if(ts.every(v=>v && v===ts[0])) { g.winLine = l; return ts[0]; } } return null;
         }
 
-        function findWinningAction(color) {
-            for(let i=0; i<16; i++) {
-                if(!g.board[i]) {
-                    let tb = [...g.board]; tb[i] = { top: color };
-                    if(checkBingo(tb) === color) return { idx: i, type: 'place' };
-                }
-            }
-            if(g.turn >= 15) {
-                for(let i=0; i<16; i++) {
-                    if(g.board[i] && i !== g.lastIdx) {
-                        let tb = JSON.parse(JSON.stringify(g.board));
-                        tb[i].top = g.board[i].bottom; tb[i].bottom = g.board[i].top;
-                        if(checkBingo(tb) === color) return { idx: i, type: 'flip' };
-                    }
-                }
-            }
-            return null;
-        }
-
-        function findStrategicIdx() {
-            const emps = g.board.map((v,i)=>v===null?i:null).filter(v=>v!==null);
-            const centers = emps.filter(i => [5,6,9,10].includes(i));
-            return centers.length > 0 ? centers[Math.floor(Math.random()*centers.length)] : emps[Math.floor(Math.random()*emps.length)];
-        }
-
-        // --- 결과 안내 및 라운드 관리 ---
-        function showGameResult(winColor, onlineData = null) {
-            const isMeWin = winColor === g.target;
-            if(!g.isAI && onlineData) { g.scores = { host: onlineData.host.score, guest: onlineData.guest.score }; }
-            else if(g.isAI) { g.scores[isMeWin ? g.role : (g.role==='host'?'guest':'host')]++; }
+        function showResult(winColor, onlineData = null) {
+            if(onlineData) g.scores = { host: onlineData.host.score, guest: onlineData.guest.score };
+            else if(g.isAI) g.scores[winColor === g.target ? g.role : (g.role==='host'?'guest':'host')]++;
 
             switchScreen('screen-result');
-            document.getElementById('res-win-title').innerText = isMeWin ? "ROUND VICTORY!" : "ROUND DEFEAT..";
-            document.getElementById('res-win-title').style.color = isMeWin ? "#00c853" : "#ff4d4d";
-            document.getElementById('res-desc').innerHTML = `<b>${winColor.toUpperCase()}</b> 빙고가 완성되었습니다.<br>현재 스코어를 확인하세요.`;
+            document.getElementById('res-win-title').innerText = winColor === g.target ? "라운드 승리!" : "라운드 패배..";
+            document.getElementById('res-desc').innerHTML = `<b style='color:${winColor}'>${winColor.toUpperCase()}</b> 빙고 완성`;
             document.getElementById('res-score-board').innerText = `${g.scores.host} : ${g.scores.guest}`;
-            
-            const btn = document.getElementById('res-next-btn');
-            if(g.scores.host >= 2 || g.scores.guest >= 2) {
-                btn.innerText = "최종 결과 확인 및 로비로";
-                btn.onclick = () => location.reload();
-            } else {
-                btn.innerText = "다음 라운드 시작";
-                btn.onclick = resetRound;
-            }
+            document.getElementById('res-next-btn').onclick = (g.scores.host>=2 || g.scores.guest>=2) ? () => location.reload() : window.resetRound;
+            renderAll();
         }
 
-        async function resetRound() {
-            g.board=Array(16).fill(null); g.turn=1; g.lastIdx=-1; g.winLine=[];
-            g.inv=getNewInv(); g.aiInv=getNewInv();
-            if(!g.isAI) {
-                await updateDoc(doc(db, "war_un_v14", g.room), { status:'playing', board:g.board, turn:1, lastIdx:-1, "host.inv":g.inv, "guest.inv":g.inv });
-            }
+        window.resetRound = async () => {
+            g.board = Array(16).fill(null); g.turn = 1; g.lastIdx = -1; g.winLine = [];
+            g.inv = getNewInv(); g.aiInv = getNewInv();
+            if(!g.isAI) await updateDoc(doc(db, "unwar_v18", g.room), { status:'playing', turn:1, board:g.board, lastIdx:-1, "host.inv":g.inv, "guest.inv":g.inv });
             switchScreen('screen-game'); renderAll();
         }
 
-        // --- 유틸리티 ---
-        function checkBingo(b) {
-            const lines = [[0,1,2,3],[4,5,6,7],[8,9,10,11],[12,13,14,15],[0,4,8,12],[1,5,9,13],[2,6,10,14],[3,7,11,15],[0,5,10,15],[3,6,9,12]];
-            for(let l of lines) {
-                const ts = l.map(i => b[i]?.top);
-                if(ts.every(v => v && v === ts[0])) { g.winLine = l; return ts[0]; }
-            }
-            return null;
-        }
-
-        function renderAll(myNick='YOU', oppNick='OPP') {
+        function renderAll(myNick='YOU') {
             const b = document.getElementById('board'); b.innerHTML = '';
             g.board.forEach((c, i) => {
                 const d = document.createElement('div');
-                d.className = 'cell' + (g.lastIdx === i ? ' last-act' : '') + (g.mFrom === i ? ' move-ready' : '') + (g.winLine.includes(i) ? ' win-line' : '');
+                d.className = 'cell' + (g.lastIdx === i ? ' last-act' : '') + (g.winLine.includes(i) ? ' win-line' : '');
                 if(c) { const p = document.createElement('div'); p.className = `piece bg-${c.top} bd-${c.bottom}`; d.appendChild(p); }
                 d.onclick = () => window.handleMove(i); b.appendChild(d);
             });
@@ -369,23 +331,17 @@
             g.inv.forEach((it, i) => {
                 const d = document.createElement('div'); d.className = `inv-item ${g.selIdx === i ? 'selected' : ''}`;
                 d.innerHTML = `<div class="inv-preview bg-${it.sides[it.top]} bd-${it.sides[1-it.top]}"></div><div style="font-size:10px;">${it.count}개</div>`;
-                d.onclick = () => { g.selIdx = i; renderAll(myNick, oppNick); }; invUI.appendChild(d);
+                d.onclick = () => { g.selIdx = i; renderAll(myNick); }; invUI.appendChild(d);
             });
-            document.getElementById('turn-txt').innerText = `제 ${g.turn}턴 (${Math.ceil(g.turn/2)}회차)`;
+            document.getElementById('turn-txt').innerText = `제 ${g.turn}턴`;
             document.getElementById('my-target-color').innerText = g.target.toUpperCase();
-            document.getElementById('my-target-color').style.color = `var(--${g.target})`;
             document.getElementById('phase2-ui').style.display = g.turn >= 15 ? 'flex' : 'none';
-            document.getElementById('p1-name').innerText = myNick; document.getElementById('p2-name').innerText = oppNick;
-            renderDots('p1-dots', g.scores.host); renderDots('p2-dots', g.scores.guest);
         }
 
-        function renderDots(id, s) { const el=document.getElementById(id); el.innerHTML=''; for(let i=0; i<2; i++){ const d=document.createElement('div'); d.className='score-dot'+(i<s?' win':''); el.appendChild(d); }}
         function switchScreen(id) { document.querySelectorAll('.screen').forEach(s => s.classList.remove('active')); document.getElementById(id).classList.add('active'); }
-        
         window.handleMove = handleMove; window.submitRPS = submitRPS; window.confirmRole = confirmRole; window.initGame = initGame;
-        window.setAct = (a) => { g.act = a; g.mFrom = null; renderAll(); };
+        window.setAct = (a) => { g.act = a; renderAll(); };
         window.flipSelected = () => { g.inv[g.selIdx].top = 1 - g.inv[g.selIdx].top; renderAll(); };
-        window.nextRoundAction = resetRound;
     </script>
 </body>
 </html>
