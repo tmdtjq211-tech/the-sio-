@@ -2,65 +2,68 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <title>UNIVERSITY WAR: BINGO PRO v2.5</title>
+    <title>UNIVERSITY WAR: BINGO PRO (OFFICIAL v3.5)</title>
     <style>
-        :root { --bg: #0d0f1a; --panel: #1a1c2c; --red: #ff4d4d; --yellow: #ffd700; --blue: #4d79ff; --hl: #ffffff; }
+        :root { --bg: #0a0c14; --panel: #161b2a; --red: #ff4d4d; --yellow: #ffd700; --blue: #4d79ff; }
         body { background: var(--bg); color: #fff; font-family: 'Pretendard', sans-serif; margin: 0; display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
         
         .screen { display: none; width: 100%; max-width: 450px; padding: 20px; text-align: center; box-sizing: border-box; }
         .active { display: block; }
 
-        /* 보드판 및 말 디자인 */
-        .board { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; background: #2a2d3e; padding: 12px; border-radius: 12px; margin: 15px 0; }
+        /* 보드판 디자인 */
+        .board { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; background: #222639; padding: 12px; border-radius: 12px; margin: 15px 0; }
         .cell { aspect-ratio: 1/1; background: #1a1c2c; border: 1px solid #3f445e; border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; position: relative; }
-        .cell.last-act { outline: 3px solid var(--hl); outline-offset: -3px; }
+        
+        /* 마지막 수 하이라이트 (말의 테두리를 가리지 않음) */
+        .cell.last-act { outline: 4px solid #ffffff; outline-offset: 2px; border-radius: 8px; z-index: 10; }
 
-        /* 말: 내부(앞면), 테두리(뒷면) - 요청사항 반영 */
+        /* 말 디자인: 내부(앞면), 테두리(뒷면) */
         .piece { 
             width: 80%; height: 80%; border-radius: 6px; 
-            box-sizing: border-box; border-width: 6px; border-style: solid;
+            box-sizing: border-box; border-width: 7px; border-style: solid;
             transition: all 0.2s;
         }
         .bg-red { background-color: var(--red); } .bd-red { border-color: var(--red); }
         .bg-yellow { background-color: var(--yellow); } .bd-yellow { border-color: var(--yellow); }
         .bg-blue { background-color: var(--blue); } .bd-blue { border-color: var(--blue); }
 
-        /* 인벤토리 (내 말 목록) - 흰색 테두리 제거 및 강조 효과 변경 */
+        /* 인벤토리 (요청사항: 하얀 테두리 제거) */
         .inventory { display: flex; justify-content: space-around; background: var(--panel); padding: 15px; border-radius: 12px; border: 1px solid #333; margin-top: 10px; }
-        .inv-item { cursor: pointer; padding: 5px; border-radius: 8px; transition: 0.2s; text-align: center; filter: brightness(0.6); }
+        .inv-item { cursor: pointer; padding: 8px; border-radius: 8px; transition: 0.3s; text-align: center; opacity: 0.4; }
+        
+        /* 선택 시 강조: 글로우 효과만 사용 */
         .inv-item.selected { 
-            filter: brightness(1.1);
-            box-shadow: 0 0 15px rgba(255, 255, 255, 0.4); /* 선택 시 흰 테두리 대신 글로우 효과 */
-            background: rgba(255, 255, 255, 0.05);
+            opacity: 1; 
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.4); 
+            background: rgba(255, 255, 255, 0.1);
         }
-        .inv-preview { width: 40px; height: 40px; border-radius: 4px; border: 5px solid; margin: 0 auto 5px; }
+        .inv-preview { width: 45px; height: 45px; border-radius: 6px; border-width: 6px; border-style: solid; margin: 0 auto 5px; }
 
-        /* 버튼류 */
         button { background: #2d334d; color: white; border: 1px solid #444; padding: 12px; border-radius: 8px; cursor: pointer; width: 100%; margin: 5px 0; font-weight: bold; }
-        button.primary { background: var(--blue); border: none; }
+        button.primary { background: #4d79ff; border: none; }
         button.act-on { background: #00c853; border-color: #fff; }
         .act-group { display: flex; gap: 5px; margin-bottom: 10px; }
         
-        #status-bar { background: var(--panel); padding: 15px; border-radius: 12px; margin-bottom: 15px; border-left: 5px solid var(--blue); }
+        #status-bar { background: var(--panel); padding: 15px; border-radius: 12px; margin-bottom: 15px; border-left: 5px solid #4d79ff; }
     </style>
 </head>
 <body>
 
     <div id="screen-lobby" class="screen active">
         <h1>UNIVERSITY WAR</h1>
-        <p style="color: #888;">양면빙고 Official Rule (Non-Google)</p>
+        <p style="color: #888;">양면빙고 PRO (v3.5)</p>
         <input type="text" id="nick-in" placeholder="닉네임" style="width:100%; padding:12px; margin-bottom:10px; background:#111; border:1px solid #444; color:#fff; border-radius:8px;">
-        <button class="primary" onclick="startTutorial()">게임 방법</button>
+        <button class="primary" onclick="alert('8번째 턴(15턴)부터 이동/뒤집기가 가능해집니다!')">규칙 확인</button>
         <button onclick="initGame('ai')">AI 연습 모드</button>
         <hr style="border: 0.5px solid #333; margin: 20px 0;">
         <input type="text" id="room-in" placeholder="방 코드" style="width:100%; padding:12px; margin-bottom:10px; background:#111; border:1px solid #444; color:#fff; border-radius:8px;">
-        <button onclick="initGame('online')">방 입장하기</button>
+        <button onclick="initGame('online')">방 코드 입장</button>
     </div>
 
     <div id="screen-game" class="screen">
         <div id="status-bar">
-            <div id="turn-txt" style="font-size: 1rem; color: #4d79ff;">차례 대기 중...</div>
-            <div id="target-txt" style="margin-top:5px; font-weight:bold;">목표: <span id="my-target">-</span></div>
+            <div id="turn-txt" style="font-size: 1rem; font-weight:bold; color: #4d79ff;">차례 대기...</div>
+            <div id="target-txt" style="margin-top:5px; font-weight:bold;">목표 색상: <span id="my-target">-</span></div>
         </div>
 
         <div class="board" id="board"></div>
@@ -74,8 +77,8 @@
         </div>
 
         <div class="inventory" id="inv-ui"></div>
-        <button style="background:#444; font-size:0.8rem; margin-top:10px;" onclick="flipSelected()">선택한 말 뒤집기</button>
-        <button onclick="location.reload()" style="margin-top:20px; background:#222; font-size:0.8rem;">로비로 이동</button>
+        <button style="background:#444; font-size:0.85rem; margin-top:10px;" onclick="flipSelected()">내 말 뒤집기 (앞/뒷면 교체)</button>
+        <button onclick="location.reload()" style="margin-top:20px; background:#222; font-size:0.8rem;">로비로 나가기</button>
     </div>
 
     <script type="module">
@@ -94,9 +97,8 @@
         const db = getFirestore(app);
 
         let g = {
-            isAI: false, role: 'host', room: '', nick: '',
-            target: '', aiTarget: '', turn: 1, lastIdx: -1,
-            board: Array(16).fill(null),
+            isAI: false, role: 'host', room: '', turn: 1, lastIdx: -1,
+            target: '', board: Array(16).fill(null),
             inv: [
                 { sides: ['red', 'yellow'], count: 3, top: 0 },
                 { sides: ['yellow', 'blue'], count: 3, top: 0 },
@@ -108,30 +110,25 @@
         const PIECE_TYPES = [['red', 'yellow'], ['yellow', 'blue'], ['blue', 'red']];
 
         window.initGame = async (mode) => {
-            g.nick = document.getElementById('nick-in').value || 'Guest';
             const colors = ['red', 'yellow', 'blue'].sort(() => Math.random() - 0.5);
-            
             if(mode === 'ai') {
                 g.isAI = true; g.target = colors[0]; g.aiTarget = colors[1];
                 switchScreen('screen-game');
                 renderAll();
             } else {
                 g.room = document.getElementById('room-in').value.toUpperCase();
-                if(!g.room) return alert("방 코드를 입력하세요.");
-                
-                const ref = doc(db, "pro_bingo", g.room);
+                const ref = doc(db, "war_bingo_v4", g.room);
                 const snap = await getDoc(ref);
                 if(!snap.exists()) {
                     await setDoc(ref, { 
                         board: Array(16).fill(null), turn: 1, lastIdx: -1,
-                        host: { nick: g.nick, target: colors[0], inv: g.inv },
-                        guest: null, pool: [colors[1], colors[2]]
+                        host: { target: colors[0], inv: g.inv }, pool: [colors[1], colors[2]]
                     });
                     g.role = 'host';
                 } else {
-                    const data = snap.data();
-                    if(!data.guest) {
-                        await updateDoc(ref, { guest: { nick: g.nick, target: data.pool[0], inv: g.inv }});
+                    const d = snap.data();
+                    if(!d.guest) {
+                        await updateDoc(ref, { guest: { target: d.pool[0], inv: g.inv }});
                         g.role = 'guest';
                     } else { g.role = 'spectator'; }
                 }
@@ -147,8 +144,7 @@
         };
 
         function renderAll() {
-            renderBoard();
-            renderInv();
+            renderBoard(); renderInv();
             const tar = document.getElementById('my-target');
             tar.innerText = g.target.toUpperCase();
             tar.style.color = `var(--${g.target})`;
@@ -167,12 +163,13 @@
                 d.onclick = () => handleMove(i);
                 b.appendChild(d);
             });
-            const myTurn = (g.turn % 2 === 1 && g.role === 'host') || (g.turn % 2 === 0 && g.role === 'guest') || (g.isAI && g.turn % 2 === 1);
-            document.getElementById('turn-txt').innerText = `${myTurn ? '★ 당신의 차례' : '상대방 차례'} (제 ${g.turn}턴)`;
+            const isMe = (g.turn % 2 === 1 && g.role === 'host') || (g.turn % 2 === 0 && g.role === 'guest') || (g.isAI && g.turn % 2 === 1);
+            document.getElementById('turn-txt').innerText = `${isMe ? '★ 당신의 차례' : '상대방 차례'} (제 ${g.turn}턴)`;
+            
+            // 선공의 8번째 턴(15턴)부터 이동/뒤집기 UI 노출
             document.getElementById('phase2-ui').style.display = g.turn >= 15 ? 'block' : 'none';
         }
 
-        // 인벤토리 렌더링 수정: 뒷면 색상 테두리 반영 및 흰색 테두리 제거
         function renderInv() {
             const ui = document.getElementById('inv-ui'); ui.innerHTML = '';
             g.inv.forEach((item, i) => {
@@ -182,8 +179,8 @@
                 const bottomColor = item.sides[1 - item.top];
                 
                 div.innerHTML = `
-                    <div class="inv-preview bg-${topColor} bd-${bottomColor}"></div>
-                    <div style="font-size:10px;">${item.count}개</div>
+                    <div class="inv-preview bg-${topColor} bd-${bottomColor}" style="background-color: var(--${topColor}); border-color: var(--${bottomColor});"></div>
+                    <div style="font-size:11px;">${item.count}개</div>
                 `;
                 div.onclick = () => { g.selIdx = i; renderInv(); };
                 ui.appendChild(div);
@@ -196,9 +193,11 @@
         };
 
         async function handleMove(idx) {
-            const myTurn = (g.turn % 2 === 1 && g.role === 'host') || (g.turn % 2 === 0 && g.role === 'guest') || (g.isAI && g.turn % 2 === 1);
-            if(!myTurn) return;
-            if(idx === g.lastIdx && g.act !== 'place') return alert("방금 조작된 말은 보호됩니다.");
+            const isMe = (g.turn % 2 === 1 && g.role === 'host') || (g.turn % 2 === 0 && g.role === 'guest') || (g.isAI && g.turn % 2 === 1);
+            if(!isMe) return;
+
+            // 방어 규칙: 상대가 방금 건드린 말은 이동/뒤집기 불가
+            if(idx === g.lastIdx && g.act !== 'place') return alert("상대가 방금 조작한 말은 보호됩니다!");
 
             let ok = false;
             if(g.act === 'place' && !g.board[idx]) {
@@ -206,23 +205,25 @@
                 if(it.count <= 0) return alert("말이 부족합니다.");
                 g.board[idx] = { top: it.sides[it.top], bottom: it.sides[1 - it.top] };
                 it.count--; ok = true;
-            } else if(g.act === 'flip' && g.board[idx]) {
+            } else if(g.act === 'flip' && g.board[idx] && g.turn >= 15) {
                 const p = g.board[idx]; g.board[idx] = { top: p.bottom, bottom: p.top }; ok = true;
-            } else if(g.act === 'move') {
-                if(g.mFrom === null && g.board[idx]) { g.mFrom = idx; alert("이동할 칸 선택"); }
+            } else if(g.act === 'move' && g.turn >= 15) {
+                if(g.mFrom === null && g.board[idx]) { g.mFrom = idx; alert("이동할 칸을 선택하세요."); }
                 else if(g.mFrom !== null && !g.board[idx]) {
                     if([1, 4].includes(Math.abs(g.mFrom - idx))) {
                         g.board[idx] = g.board[g.mFrom]; g.board[g.mFrom] = null;
                         ok = true; g.mFrom = null;
-                    } else { g.mFrom = null; alert("인접 칸만 가능"); }
+                    } else { g.mFrom = null; alert("인접한 칸만 가능합니다."); }
                 }
+            } else if(g.turn < 15 && (g.act === 'move' || g.act === 'flip')) {
+                return alert("15턴(선공의 8번째 턴)부터 가능한 행동입니다!");
             }
 
             if(ok) {
                 g.turn++; g.lastIdx = idx;
-                if(g.isAI) { renderAll(); if(!checkWin()) setTimeout(aiPlay, 800); }
+                if(g.isAI) { renderAll(); if(!checkWin()) setTimeout(aiTurn, 800); }
                 else {
-                    const ref = doc(db, "pro_bingo", g.room);
+                    const ref = doc(db, "war_bingo_v4", g.room);
                     const p = g.role === 'host' ? 'host' : 'guest';
                     await updateDoc(ref, { board: g.board, turn: g.turn, lastIdx: idx, [`${p}.inv`]: g.inv });
                 }
@@ -230,21 +231,15 @@
             }
         }
 
-        // 지능형 AI 로직
-        function aiPlay() {
+        function aiTurn() {
             const empties = g.board.map((v, i) => v === null ? i : null).filter(v => v !== null);
             if(empties.length === 0) return;
-
-            // 1. 방해 로직: 플레이어의 빙고 가능성 체크
-            // 2. 공격 로직: 자신의 목표색 연결
-            let choice = empties[Math.floor(Math.random() * empties.length)];
             
-            // AI 타겟 색상 배치 (가진 말 중 aiTarget이 있는 것 우선)
-            const aiPieceIdx = PIECE_TYPES.findIndex(types => types.includes(g.aiTarget));
-            const topSide = g.aiTarget;
-            const bottomSide = PIECE_TYPES[aiPieceIdx].find(c => c !== g.aiTarget);
-
-            g.board[choice] = { top: topSide, bottom: bottomSide };
+            // 지능형 AI: 자신의 목표 색상을 맞추기 위한 최적의 수 (간략화)
+            let choice = empties[Math.floor(Math.random() * empties.length)];
+            const aiPieceIdx = PIECE_TYPES.findIndex(t => t.includes(g.aiTarget));
+            g.board[choice] = { top: g.aiTarget, bottom: PIECE_TYPES[aiPieceIdx].find(c => c !== g.aiTarget) };
+            
             g.turn++; g.lastIdx = choice;
             renderAll(); checkWin();
         }
@@ -254,7 +249,7 @@
             for(let l of lines) {
                 const t = l.map(i => g.board[i]?.top);
                 if(t.every(v => v && v === t[0])) {
-                    alert(`승리! 컬러: ${t[0].toUpperCase()}`);
+                    alert(`게임 종료! 승리: ${t[0].toUpperCase()}`);
                     location.reload(); return true;
                 }
             }
@@ -271,8 +266,6 @@
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
             document.getElementById(id).classList.add('active');
         }
-
-        window.startTutorial = () => alert("1. 목표색 4칸 빙고 만들기\n2. 인벤토리 말 클릭 후 '뒤집기'로 앞면 색상 선택 가능\n3. 모든 말은 테두리가 '뒷면 색상'임\n4. 15턴부터 이동/뒤집기 가능");
     </script>
 </body>
 </html>
