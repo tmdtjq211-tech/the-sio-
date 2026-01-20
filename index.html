@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>대학전쟁: 양면빙고 온라인</title>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+        // 1. Firebase 설정 (제공해주신 값 적용)
+        const firebaseConfig = {
+            apiKey: "AIzaSyDcKWKTei9L2Sat-XxinlXknabIcHgmjGs",
+            authDomain: "d454545-ac9b1.firebaseapp.com",
+            projectId: "d454545-ac9b1",
+            storageBucket: "d454545-ac9b1.firebasestorage.app",
+            messagingSenderId: "438189498590",
+            appId: "1:438189498590:web:5c515415a9aa1f2b5aa24f",
+            measurementId: "G-BC09V1ZZT7"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        const provider = new GoogleAuthProvider();
+
+        // 2. 전역 상태 관리
+        let currentUser = null;
+        let userNickname = "";
+
+        // UI 요소
+        const loginSection = document.getElementById('login-section');
+        const nickSection = document.getElementById('nickname-section');
+        const gameSection = document.getElementById('game-section');
+        const userNameDisplay = document.getElementById('user-name-display');
+
+        // 3. 인증 로직
+        window.login = async () => {
+            try {
+                const result = await signInWithPopup(auth, provider);
+                checkUserNickname(result.user);
+            } catch (error) {
+                console.error("로그인 실패:", error);
+            }
+        };
+
+        async function checkUserNickname(user) {
+            const userDoc = await getDoc(doc(db, "users", user.uid));
+            if (userDoc.exists()) {
+                // 닉네임이 이미 있는 경우 게임 시작
+                userNickname = userDoc.data().nickname;
+                startGame(user);
+            } else {
+                // 닉네임이 없는 경우 설정 화면으로
+                loginSection.style.display = 'none';
+                nickSection.style.display = 'block';
+                currentUser = user;
+            }
+        }
+
+        window.saveNickname = async () => {
+            const nickInput = document.getElementById('nick-input').value;
+            if (nickInput.length < 2) return alert("닉네임은 2자 이상이어야 합니다.");
+            
+            await setDoc(doc(db, "users", currentUser.uid), {
+                nickname: nickInput,
+                email: currentUser.email
+            });
+            userNickname = nickInput;
+            startGame(currentUser);
+        };
+
+        function startGame(user) {
+            loginSection.style.display = 'none';
+            nickSection.style.display = 'none';
+            gameSection.style.display = 'block';
+            userNameDisplay.innerText = `접속자: ${userNickname}`;
+            renderBoard(); // 게임판 초기화
+        }
+
+        // 4. 양면빙고 게임 로직 (간소화 통합 버전)
+        const boardState = Array(16).fill(null);
+        let currentTurn = 1; // 1: Red, 2: Blue
+        let placeMode = 'front'; 
+
+        window.handleCellClick = (idx) => {
+            if (boardState[idx]) return;
+            
+            const front = currentTurn;
+            const back = currentTurn === 1 ? 2 : 1;
+            
+            boardState[idx] = {
+                top: placeMode === 'front' ? front : back
+            };
+
+            currentTurn = currentTurn === 1 ? 2 : 1;
+            renderBoard();
+            checkBingo();
+        };
+
+        function renderBoard() {
+            const boardEl = document.getElementById('game-board');
+            boardEl.innerHTML = '';
+            boardState.forEach((cell, i) => {
+                const div = document.createElement('div');
+                div.className = 'cell';
+                div.onclick = () => handleCellClick(i);
+                if (cell) {
+                    const chip = document.createElement('div');
+                    chip.className = `chip ${cell.top === 1 ? 'red' : 'blue'}`;
+                    div.appendChild(chip);
+                }
+                boardEl.appendChild(div);
+            });
+            document.getElementById('turn-status').innerText = `${currentTurn === 1 ? 'Red' : 'Blue'} 팀 차례`;
+        }
+
+        function checkBingo() {
+            // 빙고 판정 로직 생략 (이전 답변과 동일)
+        }
+
+        window.toggleMode = (mode) => {
+            placeMode = mode;
+            document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+            event.target.classList.add('active');
+        };
+
+    </script>
+
+    <style>
+        body { background: #121212; color: #eee; font-family: 'Pretendard', sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        .container { background: #1e1e1e; padding: 2rem; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); text-align: center; width: 350px; }
+        
+        /* 섹션 제어 */
+        #nickname-section, #game-section { display: none; }
+
+        /* 버튼 스타일 */
+        button { background: #3d3d3d; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; transition: 0.3s; margin: 5px; }
+        button:hover { background: #555; }
+        .google-btn { background: #4285F4; font-weight: bold; }
+        .active { background: #00c853 !important; }
+
+        /* 게임 보드 */
+        .board { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-top: 20px; }
+        .cell { width: 70px; height: 70px; background: #2a2a2a; border-radius: 8px; display: flex; justify-content: center; align-items: center; cursor: pointer; }
+        .chip { width: 50px; height: 50px; border-radius: 50%; }
+        .red { background: #ff4d4d; box-shadow: 0 0 10px #ff4d4d; }
+        .blue { background: #4d79ff; box-shadow: 0 0 10px #4d79ff; }
+        
+        input { padding: 10px; border-radius: 5px; border: 1px solid #444; background: #2a2a2a; color: white; width: 80%; margin-bottom: 10px; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div id="login-section">
+            <h2>University War</h2>
+            <p>양면빙고 온라인에 오신 것을 환영합니다.</p>
+            <button class="google-btn" onclick="login()">Google 계정으로 로그인</button>
+        </div>
+
+        <div id="nickname-section">
+            <h3>프로필 설정</h3>
+            <p>사용하실 닉네임을 입력해주세요.</p>
+            <input type="text" id="nick-input" placeholder="닉네임 입력 (2자 이상)">
+            <button onclick="saveNickname()">게임 시작</button>
+        </div>
+
+        <div id="game-section">
+            <div id="user-name-display" style="font-size: 0.8rem; color: #aaa;"></div>
+            <h3 id="turn-status">Red 팀 차례</h3>
+            
+            <div class="board" id="game-board"></div>
+
+            <div style="margin-top: 20px;">
+                <button class="mode-btn active" onclick="toggleMode('front')">내 색상 위로</button>
+                <button class="mode-btn" onclick="toggleMode('back')">상대 색상 위로</button>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>
