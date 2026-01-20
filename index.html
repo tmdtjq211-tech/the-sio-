@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <title>UNIVERSITY WAR: BINGO PRO v5.0 (SMART AI)</title>
+    <title>UNIVERSITY WAR: BINGO PRO v6.0 (SMART FIX)</title>
     <style>
         :root { --bg: #0a0c14; --panel: #161b2a; --red: #ff4d4d; --yellow: #ffd700; --blue: #4d79ff; --hl: #ffffff; }
         body { background: var(--bg); color: #fff; font-family: 'Pretendard', sans-serif; margin: 0; display: flex; flex-direction: column; align-items: center; min-height: 100vh; overflow: hidden; }
@@ -10,34 +10,32 @@
         .screen { display: none; width: 100%; max-width: 480px; padding: 20px; text-align: center; box-sizing: border-box; height: 100vh; overflow-y: auto; }
         .active { display: block; }
 
-        /* 스코어보드 & 상단 바 */
+        /* 스코어보드 (3판 2선승) */
         .scoreboard { display: flex; justify-content: space-around; background: #1a1c2c; padding: 12px; border-radius: 10px; margin-bottom: 10px; border: 1px solid #333; }
         .score-dot { width: 14px; height: 14px; border-radius: 50%; background: #333; margin: 0 4px; display: inline-block; transition: 0.3s; }
         .score-dot.win { background: #00c853; box-shadow: 0 0 10px #00c853; }
-        #status-bar { background: var(--panel); padding: 12px; border-radius: 12px; margin-bottom: 15px; border-left: 5px solid var(--blue); }
 
-        /* 빙고 보드 및 말 디자인 (뒷면색 테두리 고수) */
+        /* 보드 디자인 */
         .board { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; background: #222639; padding: 15px; border-radius: 15px; margin: 10px 0; }
         .cell { aspect-ratio: 1/1; background: #1a1c2c; border: 1px solid #3f445e; border-radius: 10px; cursor: pointer; display: flex; align-items: center; justify-content: center; position: relative; }
         .cell.last-act { outline: 4px solid var(--hl); outline-offset: 3px; z-index: 5; }
+        .cell.move-ready { background: rgba(77, 121, 255, 0.3); box-shadow: inset 0 0 15px var(--blue); }
 
-        .piece { width: 80%; height: 80%; border-radius: 8px; box-sizing: border-box; border-width: 7px; border-style: solid; transition: transform 0.3s; }
+        /* 말 디자인: 테두리가 뒷면색 */
+        .piece { width: 85%; height: 85%; border-radius: 8px; box-sizing: border-box; border-width: 7px; border-style: solid; transition: transform 0.3s; }
         .bg-red { background-color: var(--red); } .bd-red { border-color: var(--red); }
         .bg-yellow { background-color: var(--yellow); } .bd-yellow { border-color: var(--yellow); }
         .bg-blue { background-color: var(--blue); } .bd-blue { border-color: var(--blue); }
 
-        /* 인벤토리 (뒷면 색상 테두리 적용 및 글로우 효과) */
+        /* 인벤토리 (뒷면 색상 테두리) */
         .inventory { display: flex; justify-content: space-around; background: var(--panel); padding: 15px; border-radius: 12px; border: 1px solid #333; margin-top: 5px; }
-        .inv-item { cursor: pointer; padding: 10px; border-radius: 10px; opacity: 0.4; transition: 0.3s; }
-        .inv-item.selected { opacity: 1; box-shadow: 0 0 20px rgba(255, 255, 255, 0.4); background: rgba(255,255,255,0.1); }
+        .inv-item { cursor: pointer; padding: 8px; border-radius: 10px; opacity: 0.4; transition: 0.3s; position: relative; }
+        .inv-item.selected { opacity: 1; box-shadow: 0 0 20px rgba(255, 255, 255, 0.5); background: rgba(255,255,255,0.1); }
         .inv-preview { width: 45px; height: 45px; border-radius: 8px; border-width: 6px; border-style: solid; margin: 0 auto 5px; }
 
-        /* 버튼 및 오버레이 */
-        button { background: #2d334d; color: white; border: 1px solid #444; padding: 14px; border-radius: 8px; cursor: pointer; width: 100%; margin: 6px 0; font-weight: bold; font-size: 1rem; }
+        button { background: #2d334d; color: white; border: 1px solid #444; padding: 14px; border-radius: 8px; cursor: pointer; width: 100%; margin: 6px 0; font-weight: bold; }
         .primary { background: var(--blue); border: none; }
         .btn-act { background: #00c853; border-color: #fff; }
-        #matching-ui { animation: fadeIn 0.5s; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
     </style>
 </head>
 <body>
@@ -45,36 +43,30 @@
     <div id="screen-lobby" class="screen active">
         <h1 style="letter-spacing: 5px;">UNIVERSITY WAR</h1>
         <div id="lobby-main">
-            <input type="text" id="nick-in" placeholder="닉네임 입력" style="width:100%; padding:14px; margin-bottom:12px; background:#111; border:1px solid #444; color:#fff; border-radius:8px; box-sizing:border-box;">
-            <button class="primary" onclick="startTutorial()">플레이 가이드 (튜토리얼)</button>
-            <button onclick="initGame('ai')">스마트 AI 대결 (연습)</button>
+            <input type="text" id="nick-in" placeholder="닉네임" style="width:100%; padding:14px; margin-bottom:12px; background:#111; border:1px solid #444; color:#fff; border-radius:8px; box-sizing:border-box;">
+            <button class="primary" onclick="startTutorial()">공식 규칙 가이드</button>
+            <button onclick="initGame('ai')">AI 대결 (인벤토리 버그 수정)</button>
             <hr style="border: 0.5px solid #333; margin: 20px 0;">
-            <input type="text" id="room-in" placeholder="방 코드 입력" style="width:100%; padding:14px; margin-bottom:12px; background:#111; border:1px solid #444; color:#fff; border-radius:8px; box-sizing:border-box;">
-            <button onclick="initGame('online')">실시간 매칭 입장</button>
+            <input type="text" id="room-in" placeholder="방 코드" style="width:100%; padding:14px; margin-bottom:12px; background:#111; border:1px solid #444; color:#fff; border-radius:8px; box-sizing:border-box;">
+            <button onclick="initGame('online')">온라인 매칭</button>
         </div>
         <div id="matching-ui" style="display:none; margin-top:30px;">
-            <div style="color: var(--blue); font-size: 1.2rem; margin-bottom: 10px;">상대방을 찾는 중...</div>
+            <div style="color: var(--blue); font-size: 1.2rem; animation: pulse 1.5s infinite;">상대방 기다리는 중...</div>
             <p id="room-code-tag" style="background: #222; padding: 10px; border-radius: 5px;"></p>
-            <button onclick="location.reload()" style="background: #444;">매칭 취소</button>
+            <button onclick="location.reload()">취소</button>
         </div>
     </div>
 
     <div id="screen-game" class="screen">
         <div class="scoreboard">
-            <div id="p1-area">
-                <span id="p1-name" style="font-weight:bold;">PLAYER 1</span><br>
-                <div id="p1-dots"></div>
-            </div>
-            <div style="font-size: 1.5rem; font-weight: bold; color: #555;">VS</div>
-            <div id="p2-area">
-                <span id="p2-name" style="font-weight:bold;">PLAYER 2</span><br>
-                <div id="p2-dots"></div>
-            </div>
+            <div><span id="p1-name">PLAYER 1</span><br><div id="p1-dots"></div></div>
+            <div style="font-size: 1.2rem; font-weight: bold; color: #555;">ROUND</div>
+            <div><span id="p2-name">PLAYER 2</span><br><div id="p2-dots"></div></div>
         </div>
 
-        <div id="status-bar">
-            <div id="turn-txt" style="font-size: 1.1rem; font-weight: bold; color: var(--blue);">데이터 동기화 중...</div>
-            <div id="target-txt" style="margin-top:5px; font-weight:bold;">목표 색상: <span id="my-target">-</span></div>
+        <div id="status-bar" style="background: var(--panel); padding: 12px; border-radius: 12px; margin-bottom: 10px;">
+            <div id="turn-txt" style="font-weight: bold; color: var(--blue);">차례 정보 로딩...</div>
+            <div id="target-txt" style="margin-top:5px; font-weight:bold;">목표: <span id="my-target">-</span></div>
         </div>
 
         <div class="board" id="board"></div>
@@ -86,7 +78,8 @@
         </div>
 
         <div class="inventory" id="inv-ui"></div>
-        <button style="background:#444; font-size:0.9rem; margin-top:10px;" onclick="flipSelected()">말 뒤집기 (앞면 색상 선택)</button>
+        <button style="background:#444; font-size:0.9rem; margin-top:10px;" onclick="flipSelected()">내 말 뒤집기 (앞면 선택)</button>
+        <button onclick="location.reload()" style="background:#222; font-size:0.7rem; border:none; margin-top:10px;">방 나가기</button>
     </div>
 
     <script type="module">
@@ -97,60 +90,52 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-        let g = { room: '', nick: '', role: 'host', isAI: false, target: '', aiTarget: '', turn: 1, lastIdx: -1, board: Array(16).fill(null), inv: [{sides:['red','yellow'], count:3, top:0}, {sides:['yellow','blue'], count:3, top:0}, {sides:['blue','red'], count:3, top:0}], selIdx: 0, act: 'place', scores: {host:0, guest:0} };
-
         const PIECE_TYPES = [['red', 'yellow'], ['yellow', 'blue'], ['blue', 'red']];
+        let g = { room: '', role: 'host', isAI: false, target: '', aiTarget: '', turn: 1, lastIdx: -1, board: Array(16).fill(null), inv: [], aiInv: [], selIdx: 0, act: 'place', mFrom: null, scores: {host:0, guest:0} };
 
-        // --- 초기화 & 매칭 ---
+        function getNewInv() { return PIECE_TYPES.map(t => ({ sides: t, count: 3, top: 0 })); }
+
+        // --- 초기화 ---
         window.initGame = async (mode) => {
-            g.nick = document.getElementById('nick-in').value || 'Guest';
+            const nick = document.getElementById('nick-in').value || 'Guest';
             const colors = ['red', 'yellow', 'blue'].sort(() => Math.random() - 0.5);
+            g.inv = getNewInv();
             
             if(mode === 'ai') {
-                g.isAI = true; g.target = colors[0]; g.aiTarget = colors[1];
-                document.getElementById('screen-lobby').classList.remove('active');
-                document.getElementById('screen-game').classList.add('active');
-                renderAll();
+                g.isAI = true; g.role = 'host'; g.target = colors[0]; g.aiTarget = colors[1];
+                g.aiInv = getNewInv();
+                switchScreen('screen-game'); renderAll(nick, 'SMART AI');
             } else {
                 g.room = document.getElementById('room-in').value.toUpperCase();
-                if(!g.room) return alert("방 코드를 입력하세요.");
-                const ref = doc(db, "match_pro_v5", g.room);
+                const ref = doc(db, "war_bingo_v6", g.room);
                 const snap = await getDoc(ref);
                 if(!snap.exists()) {
                     g.role = 'host';
-                    await setDoc(ref, { status:'waiting', board:Array(16).fill(null), turn:1, lastIdx:-1, host:{nick:g.nick, target:colors[0], inv:g.inv, score:0}, guest:null, pool:[colors[1], colors[2]] });
+                    await setDoc(ref, { status:'waiting', board:Array(16).fill(null), turn:1, lastIdx:-1, host:{nick, target:colors[0], inv:g.inv, score:0}, guest:null, pool:[colors[1], colors[2]] });
                     document.getElementById('lobby-main').style.display='none';
                     document.getElementById('matching-ui').style.display='block';
-                    document.getElementById('room-code-tag').innerText = `방 코드: ${g.room}`;
+                    document.getElementById('room-code-tag').innerText = `코드: ${g.room}`;
                 } else {
                     const d = snap.data(); if(d.guest) return alert("가득 찬 방입니다.");
                     g.role = 'guest';
-                    await updateDoc(ref, { status:'playing', guest:{nick:g.nick, target:d.pool[0], inv:g.inv, score:0} });
+                    await updateDoc(ref, { status:'playing', guest:{nick, target:d.pool[0], inv:g.inv, score:0} });
                 }
-                onSnapshot(ref, (s) => { 
-                    const data = s.data(); if(data && data.status === 'playing') {
-                        document.getElementById('screen-lobby').classList.remove('active');
-                        document.getElementById('screen-game').classList.add('active');
-                        syncData(data);
-                    }
-                });
+                onSnapshot(ref, (s) => { const d = s.data(); if(d && d.status === 'playing') { switchScreen('screen-game'); sync(d); } });
             }
         };
 
-        function syncData(data) {
-            g.board = data.board; g.turn = data.turn; g.lastIdx = data.lastIdx;
-            g.scores = { host: data.host.score, guest: data.guest.score };
-            const me = g.role === 'host' ? data.host : data.guest;
-            const opp = g.role === 'host' ? data.guest : data.host;
-            g.target = me.target; g.inv = me.inv;
-            renderAll(me.nick, opp.nick);
+        function sync(d) {
+            g.board=d.board; g.turn=d.turn; g.lastIdx=d.lastIdx;
+            g.scores={host:d.host.score, guest:d.guest.score};
+            const me = g.role==='host'?d.host:d.guest; const opp = g.role==='host'?d.guest:d.host;
+            g.target=me.target; g.inv=me.inv; renderAll(me.nick, opp.nick);
         }
 
-        // --- 렌더링 ---
-        function renderAll(myNick = 'PLAYER', oppNick = 'AI') {
+        function renderAll(myNick, oppNick) {
             const b = document.getElementById('board'); b.innerHTML = '';
             g.board.forEach((c, i) => {
-                const d = document.createElement('div'); d.className = 'cell' + (g.lastIdx === i ? ' last-act' : '');
+                const d = document.createElement('div');
+                d.className = 'cell' + (g.lastIdx === i ? ' last-act' : '') + (g.mFrom === i ? ' move-ready' : '');
                 if(c) { const p = document.createElement('div'); p.className = `piece bg-${c.top} bd-${c.bottom}`; d.appendChild(p); }
                 d.onclick = () => handleMove(i); b.appendChild(d);
             });
@@ -160,109 +145,106 @@
                 const d = document.createElement('div'); d.className = `inv-item ${g.selIdx === i ? 'selected' : ''}`;
                 const top = it.sides[it.top], bot = it.sides[1-it.top];
                 d.innerHTML = `<div class="inv-preview bg-${top} bd-${bot}"></div><div style="font-size:11px;">${it.count}개</div>`;
-                d.onclick = () => { g.selIdx = i; renderAll(myNick, oppNick); };
-                invUI.appendChild(d);
+                d.onclick = () => { g.selIdx = i; renderAll(myNick, oppNick); }; invUI.appendChild(d);
             });
 
-            const isMyTurn = (g.turn % 2 === 1 && g.role === 'host') || (g.turn % 2 === 0 && g.role === 'guest') || (g.isAI && g.turn % 2 === 1);
-            document.getElementById('turn-txt').innerText = isMyTurn ? "★ 당신의 차례" : "상대방의 차례";
+            const isMe = (g.turn%2===1 && g.role==='host') || (g.turn%2===0 && g.role==='guest') || (g.isAI && g.turn%2===1);
+            document.getElementById('turn-txt').innerText = isMe ? "★ 당신의 차례" : "상대방의 차례";
             document.getElementById('my-target').innerText = g.target.toUpperCase();
             document.getElementById('my-target').style.color = `var(--${g.target})`;
             document.getElementById('phase2-ui').style.display = g.turn >= 15 ? 'flex' : 'none';
-
-            document.getElementById('p1-name').innerText = g.role === 'host' ? myNick : oppNick;
-            document.getElementById('p2-name').innerText = g.role === 'guest' ? myNick : oppNick;
-            renderDots('p1-dots', g.role === 'host' ? g.scores.host : g.scores.guest);
-            renderDots('p2-dots', g.role === 'guest' ? g.scores.host : g.scores.guest);
+            document.getElementById('p1-name').innerText = g.role==='host'?myNick:oppNick;
+            document.getElementById('p2-name').innerText = g.role==='guest'?myNick:oppNick;
+            renderDots('p1-dots', g.role==='host'?g.scores.host:g.scores.guest);
+            renderDots('p2-dots', g.role==='guest'?g.scores.host:g.scores.guest);
         }
 
-        function renderDots(id, score) {
-            const el = document.getElementById(id); el.innerHTML = '';
-            for(let i=0; i<2; i++) {
-                const dot = document.createElement('div'); dot.className = 'score-dot' + (i < score ? ' win' : ''); el.appendChild(dot);
-            }
-        }
+        function renderDots(id, s) { const el=document.getElementById(id); el.innerHTML=''; for(let i=0; i<2; i++){ const d=document.createElement('div'); d.className='score-dot'+(i<s?' win':''); el.appendChild(d); }}
 
-        // --- 지능형 AI (Smarter Logic) ---
+        // --- 개선된 AI 로직 (인벤토리 체크 포함) ---
         function aiTurn() {
-            const emps = g.board.map((v, i) => v === null ? i : null).filter(v => v !== null);
-            if(emps.length === 0) return;
+            setTimeout(() => {
+                let choice = findMove(g.aiTarget) || findMove(g.target) || randomMove();
+                
+                // 인벤토리에서 aiTarget이 포함된 말 중 개수가 남은 것 찾기
+                let validIdx = g.aiInv.findIndex(it => it.sides.includes(g.aiTarget) && it.count > 0);
+                if(validIdx === -1) validIdx = g.aiInv.findIndex(it => it.count > 0); // 타겟 없으면 아무거나
 
-            let choice = null;
-            // 1. 내가 이번 수로 승리할 수 있는가?
-            choice = findBestMove(g.aiTarget);
-            // 2. 상대(플레이어)가 다음 수로 승리할 수 있는가? (방해)
-            if(choice === null) choice = findBestMove(g.target);
-            // 3. 없으면 랜덤
-            if(choice === null) choice = emps[Math.floor(Math.random() * emps.length)];
-
-            // AI가 가진 말 중 aiTarget이 있는 말 선택 및 방향 설정
-            const aiPieceIdx = PIECE_TYPES.findIndex(t => t.includes(g.aiTarget));
-            g.board[choice] = { top: g.aiTarget, bottom: PIECE_TYPES[aiPieceIdx].find(c => c !== g.aiTarget) };
-            
-            g.turn++; g.lastIdx = choice;
-            const winColor = checkBingo(g.board);
-            if(winColor) handleWin(winColor === g.target ? 'host' : 'guest');
-            else renderAll();
+                if(validIdx !== -1) {
+                    const it = g.aiInv[validIdx];
+                    const topColor = it.sides.includes(g.aiTarget) ? g.aiTarget : it.sides[0];
+                    const bottomColor = it.sides.find(c => c !== topColor);
+                    
+                    g.board[choice] = { top: topColor, bottom: bottomColor };
+                    it.count--; // AI 인벤토리 차감
+                    g.turn++; g.lastIdx = choice;
+                    
+                    const win = checkBingo(g.board);
+                    if(win) handleWin(win===g.target?'host':'guest'); else renderAll();
+                }
+            }, 800);
         }
 
-        function findBestMove(targetColor) {
-            const emps = g.board.map((v, i) => v === null ? i : null).filter(v => v !== null);
-            for(let idx of emps) {
-                let tempBoard = [...g.board];
-                tempBoard[idx] = { top: targetColor };
-                if(checkBingo(tempBoard)) return idx;
-            }
-            return null;
+        function findMove(c) {
+            for(let i=0; i<16; i++) { if(!g.board[i]) { let tb=[...g.board]; tb[i]={top:c}; if(checkBingo(tb)) return i; } } return null;
         }
+        function randomMove() { const emps = g.board.map((v,i)=>v===null?i:null).filter(v=>v !== null); return emps[Math.floor(Math.random()*emps.length)]; }
 
-        // --- 게임 액션 ---
+        // --- 개선된 이동/착수 핸들러 ---
         window.handleMove = async (idx) => {
-            const isMyTurn = (g.turn % 2 === 1 && g.role === 'host') || (g.turn % 2 === 0 && g.role === 'guest') || (g.isAI && g.turn % 2 === 1);
-            if(!isMyTurn) return;
-            if(idx === g.lastIdx && g.act !== 'place') return alert("방어 규칙: 상대가 직전에 조작한 말입니다.");
+            const isMe = (g.turn%2===1 && g.role==='host') || (g.turn%2===0 && g.role==='guest') || (g.isAI && g.turn%2===1);
+            if(!isMe) return;
+
+            // 방어 규칙
+            if(idx === g.lastIdx && g.act !== 'place') return alert("방어 규칙: 상대가 방금 조작한 말입니다.");
 
             let ok = false;
+            // 1. 착수 로직
             if(g.act === 'place' && !g.board[idx]) {
-                const it = g.inv[g.selIdx]; if(it.count <= 0) return alert("보유한 말이 없습니다.");
-                g.board[idx] = { top: it.sides[it.top], bottom: it.sides[1-it.top] };
-                it.count--; ok = true;
-            } else if(g.act === 'flip' && g.board[idx] && g.turn >= 15) {
+                const it = g.inv[g.selIdx]; if(it.count <= 0) return alert("해당 말이 없습니다.");
+                g.board[idx] = { top: it.sides[it.top], bottom: it.sides[1-it.top] }; it.count--; ok=true;
+            } 
+            // 2. 뒤집기 로직
+            else if(g.act === 'flip' && g.board[idx] && g.turn >= 15) {
                 const p = g.board[idx]; g.board[idx] = { top: p.bottom, bottom: p.top }; ok = true;
-            } else if(g.act === 'move' && g.board[idx] && g.turn >= 15) {
-                if(g.mFrom === null) { g.mFrom = idx; alert("이동할 빈 칸을 선택하세요."); }
-                else if(g.mFrom !== null && !g.board[idx]) {
-                    if([1, 4].includes(Math.abs(g.mFrom - idx))) {
+            } 
+            // 3. 개선된 이동 로직 (2단계 선택)
+            else if(g.act === 'move' && g.turn >= 15) {
+                if(g.mFrom === null) {
+                    if(!g.board[idx]) return alert("움직일 말을 선택하세요.");
+                    g.mFrom = idx; renderAll(); return; // 말 선택 완료
+                } else {
+                    if(g.board[idx]) { g.mFrom = idx; renderAll(); return; } // 말 다시 선택
+                    if([1, 4].includes(Math.abs(g.mFrom - idx))) { // 인접 체크
                         g.board[idx] = g.board[g.mFrom]; g.board[g.mFrom] = null; ok = true; g.mFrom = null;
-                    } else { g.mFrom = null; alert("인접한 칸으로만 이동 가능합니다."); }
+                    } else { alert("인접한 칸으로만 이동 가능합니다."); g.mFrom = null; renderAll(); return; }
                 }
-            }
+            } else if(g.turn < 15 && (g.act === 'move' || g.act === 'flip')) return alert("15턴부터 가능합니다!");
 
             if(ok) {
-                const winColor = checkBingo(g.board);
-                if(g.isAI) {
-                    if(winColor) handleWin(winColor === g.target ? 'host' : 'guest');
-                    else { g.turn++; g.lastIdx = idx; renderAll(); setTimeout(aiTurn, 800); }
-                } else {
-                    const ref = doc(db, "match_pro_v5", g.room);
+                const win = checkBingo(g.board);
+                if(win) handleWin(win===g.target?g.role:(g.role==='host'?'guest':'host'));
+                else if(g.isAI) { g.turn++; g.lastIdx = idx; renderAll(); aiTurn(); }
+                else {
+                    const ref = doc(db, "war_bingo_v6", g.room);
                     const p = g.role === 'host' ? 'host' : 'guest';
-                    if(winColor) {
-                        const winner = winColor === g.target ? g.role : (g.role === 'host' ? 'guest' : 'host');
-                        handleWin(winner, ref);
-                    } else {
-                        await updateDoc(ref, { board: g.board, turn: g.turn + 1, lastIdx: idx, [`${p}.inv`]: g.inv });
-                    }
+                    await updateDoc(ref, { board: g.board, turn: g.turn + 1, lastIdx: idx, [`${p}.inv`]: g.inv });
                 }
             }
         };
 
-        async function handleWin(winner, ref) {
-            alert(`라운드 종료! 승리: ${winner.toUpperCase()}`);
+        function checkBingo(b) {
+            const lines = [[0,1,2,3],[4,5,6,7],[8,9,10,11],[12,13,14,15],[0,4,8,12],[1,5,9,13],[2,6,10,14],[3,7,11,15],[0,5,10,15],[3,6,9,12]];
+            for(let l of lines) { const ts = l.map(i=>b[i]?.top); if(ts.every(v=>v && v===ts[0])) return ts[0]; } return null;
+        }
+
+        async function handleWin(winner) {
+            alert(`라운드 승리: ${winner.toUpperCase()}`);
             if(g.isAI) {
                 g.scores[winner]++;
-                if(g.scores[winner] >= 2) { alert("최종 우승!"); location.reload(); }
-                else resetRound();
+                if(g.scores[winner]>=2) { alert("최종 우승!"); location.reload(); } else resetMatch();
             } else {
+                const ref = doc(db, "war_bingo_v6", g.room);
                 const snap = await getDoc(ref); const d = snap.data();
                 const newScore = d[winner].score + 1;
                 if(newScore >= 2) { alert(`${d[winner].nick} 최종 우승!`); location.reload(); }
@@ -270,28 +252,17 @@
                     await updateDoc(ref, { 
                         board: Array(16).fill(null), turn: 1, lastIdx: -1,
                         [`${winner}.score`]: newScore,
-                        "host.inv": PIECE_TYPES.map(t => ({ sides: t, count: 3, top: 0 })),
-                        "guest.inv": PIECE_TYPES.map(t => ({ sides: t, count: 3, top: 0 }))
+                        "host.inv": getNewInv(), "guest.inv": getNewInv()
                     });
                 }
             }
         }
 
-        function resetRound() {
-            g.board = Array(16).fill(null); g.turn = 1; g.lastIdx = -1;
-            g.inv = PIECE_TYPES.map(t => ({ sides: t, count: 3, top: 0 }));
-            renderAll();
-        }
-
-        function checkBingo(board) {
-            const lines = [[0,1,2,3],[4,5,6,7],[8,9,10,11],[12,13,14,15],[0,4,8,12],[1,5,9,13],[2,6,10,14],[3,7,11,15],[0,5,10,15],[3,6,9,12]];
-            for(let l of lines) { const ts = l.map(i => board[i]?.top); if(ts.every(v => v && v === ts[0])) return ts[0]; }
-            return null;
-        }
-
+        function resetMatch() { g.board=Array(16).fill(null); g.turn=1; g.lastIdx=-1; g.inv=getNewInv(); g.aiInv=getNewInv(); renderAll(); }
         window.flipSelected = () => { g.inv[g.selIdx].top = 1 - g.inv[g.selIdx].top; renderAll(); };
-        window.setAct = (a) => { g.act = a; document.querySelectorAll('#phase2-ui button').forEach(b => b.classList.remove('btn-act')); document.getElementById(`act-${a[0]}`).classList.add('btn-act'); };
-        window.startTutorial = () => alert("1. 목표 색상 4칸 빙고 만들기 (넓은 면 기준)\n2. 9개의 양면 말을 전략적으로 사용\n3. 모든 말은 테두리가 뒷면 색상임\n4. 15턴(선공 8번째 턴)부터 이동/뒤집기 가능\n5. 3판 2선승제");
+        window.setAct = (a) => { g.act=a; g.mFrom=null; document.querySelectorAll('#phase2-ui button').forEach(b=>b.classList.remove('btn-act')); document.getElementById(`act-${a[0]}`).classList.add('btn-act'); renderAll(); };
+        function switchScreen(id) { document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active')); document.getElementById(id).classList.add('active'); }
+        window.startTutorial = () => alert("1. 목표색 빙고 4칸 만들기\n2. 15턴부터 이동/뒤집기 활성화\n3. 이동: 말 선택 후 빈 칸 클릭\n4. 상대가 방금 둔 말은 조작 불가");
     </script>
 </body>
 </html>
